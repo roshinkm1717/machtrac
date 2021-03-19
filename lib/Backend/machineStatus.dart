@@ -3,15 +3,14 @@ import 'dart:convert' as convert;
 
 import 'package:http/http.dart' as http;
 
-Future<bool> statusRequest(String machId) async {
+Future<bool> statusRequest() async {
   var userName = 'Harikrishnakv';
   var feedId = 'kmt-cnc-lathe';
-  var response =
-      await http.get(Uri.parse('https://io.adafruit.com/api/v2/$userName/feeds/$feedId/data/$machId?x-aio-key=aio_PJWb22QPEjy31tEUFS3MQdxAIGGn'));
+  var response = await http.get(Uri.parse('https://io.adafruit.com/api/v2/$userName/feeds/$feedId/data?x-aio-key=aio_PJWb22QPEjy31tEUFS3MQdxAIGGn'));
 
   if (response.statusCode == 200) {
     var jsonResponse = convert.jsonDecode(response.body);
-    var machStatus = jsonResponse['value'];
+    var machStatus = jsonResponse[0]['value'];
 
     print('status Value : $machStatus');
     print("Status : ${machStatus == '10'}");

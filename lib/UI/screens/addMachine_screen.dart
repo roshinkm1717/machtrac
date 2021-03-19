@@ -3,9 +3,11 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:machtrac/Backend/machine.dart';
 import 'package:machtrac/UI/widgets/filled_button.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -69,6 +71,7 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
   bool _isSaving = false;
   Machine machine = Machine();
   final formKey = GlobalKey<FormState>();
+  bool _link = false;
   @override
   Widget build(BuildContext context) {
     bool loc = false;
@@ -128,16 +131,49 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                           validator: RequiredValidator(errorText: "Cannot be empty"),
                         ),
                         SizedBox(height: 10),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: "Fetch link",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              machine.fetchLink = value;
-                            });
-                          },
-                          validator: RequiredValidator(errorText: "Cannot be empty"),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                decoration: InputDecoration(
+                                  labelText: "Fetch link",
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    machine.fetchLink = value;
+                                  });
+                                },
+                                validator: RequiredValidator(
+                                  errorText: "Cannot be empty",
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () async {
+                                try {
+                                  var response = await http.get(Uri.parse(machine.fetchLink));
+                                  if (response.statusCode == 400 || response.statusCode == 401 || response.statusCode == 403) {
+                                    setState(() {
+                                      _link = false;
+                                    });
+                                  } else
+                                    setState(() {
+                                      _link = true;
+                                    });
+                                } catch (e) {
+                                  setState(() {
+                                    _link = false;
+                                  });
+                                }
+                              },
+                              icon: Icon(
+                                Icons.check_circle_outline_rounded,
+                                color: (_link ?? false) ? Colors.green : Colors.red,
+                              ),
+                              focusColor: (_link ?? false) ? Colors.green : Colors.red,
+                              color: (_link ?? false) ? Colors.green : Colors.red,
+                            ),
+                          ],
                         ),
                         SizedBox(height: 10),
                         TextFormField(

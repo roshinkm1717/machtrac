@@ -49,14 +49,12 @@ class Machine {
     print("Getting status");
     var userName = 'Harikrishnakv';
     var feedId = 'kmt-cnc-lathe';
-    var response = await http.get(
-      Uri.parse(link),
-    );
+    var response = await http.get(Uri.parse(link));
+
     if (response.statusCode == 200) {
       var jsonResponse = convert.jsonDecode(response.body);
-      print(jsonResponse);
-      var machStatus = jsonResponse['value'];
-      print('status Value : $machStatus');
+      var machStatus = jsonResponse[0]['value'];
+
       return machStatus == '10' ? Future.value(true) : Future.value(false);
     } else {
       print('Request failed with status: ${response.statusCode}.');
