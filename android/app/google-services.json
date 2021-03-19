@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "882486296953",
+    "project_id": "machtrac-bec53",
+    "storage_bucket": "machtrac-bec53.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:882486296953:android:1a38fc1be5063363742fa8",
+        "android_client_info": {
+          "package_name": "com.example.machtrac"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "882486296953-lpevn7jia981rtdj56ir9s6roqsoki3s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBVdU_7WYm_yRkB0ARkrF3b28Ri0rQDzFE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "882486296953-lpevn7jia981rtdj56ir9s6roqsoki3s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
