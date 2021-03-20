@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       title: 'Machtrac',
       theme: ThemeData(
         fontFamily: 'Montserrat',
-        primarySwatch: Colors.deepPurple,
+        primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: WelcomeScreen(),

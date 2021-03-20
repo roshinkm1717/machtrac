@@ -22,7 +22,7 @@ dependencies:
   http:
   geocoding:
   geolocator:
-  url_launcher:
+  url_launcher: ^6.0.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

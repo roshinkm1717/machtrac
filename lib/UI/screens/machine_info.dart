@@ -16,6 +16,7 @@ class MachineInfo extends StatefulWidget {
 
 class _MachineInfoState extends State<MachineInfo> {
   void _launchMail(bool isDaily) async {
+    print(widget.doc.data());
     var now = DateTime.now();
     final Uri _emailLaunchUri = Uri(
       scheme: 'mailto',
@@ -23,10 +24,10 @@ class _MachineInfoState extends State<MachineInfo> {
       query:
           'subject=Request For ${isDaily ? 'Daily' : 'Weekly'} Report  &body= Machine Name : ${widget.doc['name']} \n Machine make : ${widget.doc['make']} \n Fetch link : ${widget.doc['fetchLink']} \n $now', //add subject and body here
     );
-    if (await canLaunch(_emailLaunchUri.toString())) {
+    try {
       await launch(_emailLaunchUri.toString());
-    } else {
-      throw 'could not mail';
+    } catch (e) {
+      print(e);
     }
   }
 

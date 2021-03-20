@@ -22,8 +22,14 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     setState(() {});
     checkReportsData();
-    Timer.periodic(Duration(seconds: 3), (timer) {
+    _timer();
+  }
+
+  void _timer() {
+    print("Fetch data");
+    Future.delayed(Duration(seconds: 3)).then((_) {
       setState(() {});
+      _timer();
     });
   }
 

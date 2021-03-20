@@ -150,20 +150,22 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                             ),
                             IconButton(
                               onPressed: () async {
-                                try {
-                                  var response = await http.get(Uri.parse(machine.fetchLink));
-                                  if (response.statusCode == 400 || response.statusCode == 401 || response.statusCode == 403) {
+                                if (machine.fetchLink != null) {
+                                  try {
+                                    var response = await http.get(Uri.parse(machine.fetchLink));
+                                    if (response.statusCode == 400 || response.statusCode == 401 || response.statusCode == 403) {
+                                      setState(() {
+                                        _link = false;
+                                      });
+                                    } else
+                                      setState(() {
+                                        _link = true;
+                                      });
+                                  } catch (e) {
                                     setState(() {
                                       _link = false;
                                     });
-                                  } else
-                                    setState(() {
-                                      _link = true;
-                                    });
-                                } catch (e) {
-                                  setState(() {
-                                    _link = false;
-                                  });
+                                  }
                                 }
                               },
                               icon: Icon(
@@ -236,42 +238,49 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                     Hero(
                       tag: 'button',
                       child: FilledButton(
-                        text: "Add Machine",
-                        onPressed: () async {
-                          if (formKey.currentState.validate()) {
-                            if (machine.imageName != null) {
-                              //add machine
-                              setState(() {
-                                _isSaving = true;
-                              });
-                              var res = await machine.uploadMachineData(machine);
-                              setState(() {
-                                _isSaving = false;
-                              });
-                              if (res != null) {
+                          text: "Add Machine",
+                          onPressed: () async {
+                            if (formKey.currentState.validate()) {
+                              if (machine.imageName != null) {
+                                //add machine
+                                if (_link) {
+                                  setState(() {
+                                    _isSaving = true;
+                                  });
+                                  var res = await machine.uploadMachineData(machine);
+                                  setState(() {
+                                    _isSaving = false;
+                                  });
+                                  if (res != null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("Error uploading data. Try again"),
+                                      ),
+                                    );
+                                  } else {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => HomeScreen(),
+                                      ),
+                                    );
+                                  }
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text("Please check the fetch link and try again"),
+                                    ),
+                                  );
+                                }
+                              } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    content: Text("Error uploading data. Try again"),
-                                  ),
-                                );
-                              } else {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => HomeScreen(),
+                                    content: Text("Please select an image"),
                                   ),
                                 );
                               }
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text("Please select an image"),
-                                ),
-                              );
                             }
-                          }
-                        },
-                      ),
+                          }),
                     ),
                   ],
                 ),
