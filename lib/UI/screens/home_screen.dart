@@ -42,9 +42,14 @@ class _HomeScreenState extends State<HomeScreen> {
     checkReportsData();
     _timer();
   }
+  @override
+  void dispose(){
+    _ad?.dispose();
+    super.dispose();
+  }
 
 
-  Widget checkforAd() {
+  Widget checkForAd() {
     if(isLoaded==true) {
       return Container(
         child: AdWidget(
