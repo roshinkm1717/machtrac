@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:machtrac/UI/screens/addMachine_screen.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
@@ -17,13 +18,47 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  BannerAd _ad;
+  bool isLoaded;
+
   @override
   void initState() {
     super.initState();
+    _ad=BannerAd(size: AdSize.banner,
+        adUnitId: "ca-app-pub-6444959581499725/8160194844",
+        listener: AdListener(
+          onAdLoaded: (_){
+            setState(() {
+              isLoaded=true;
+            });
+          },
+          onAdFailedToLoad: (_,error){
+            print("Ad failed to load with error: $error");
+          }
+        ),
+        request: AdRequest());
+    _ad.load();
     setState(() {});
     checkReportsData();
     _timer();
   }
+
+
+  Widget checkforAd() {
+    if(isLoaded==true) {
+      return Container(
+        child: AdWidget(
+          ad: _ad,
+        ),
+        width: _ad.size.width.toDouble(),
+        alignment: Alignment.center,
+      );
+    }
+    else{
+      return CircularProgressIndicator();
+    }
+    }
+
 
   void _timer() {
     print("Fetch data");
