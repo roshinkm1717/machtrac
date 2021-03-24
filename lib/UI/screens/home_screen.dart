@@ -80,11 +80,45 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           appBar: AppBar(
-            leading: IconButton(
-              onPressed: null,
-              icon: Icon(Icons.person),
+            leading: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    child: Icon(Icons.person),
+                  ),
+                  SizedBox(width: 10),
+                  Text(
+                    "Machtrac",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
             ),
             actions: [
+              TextButton(
+                onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text("KMT, Bangalore"),
+                          content: Text("Harikrishna K V | 966333007 | harikrishnakv@outlook.com"),
+                          actions: [
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text("Cancel")),
+                          ],
+                        );
+                      });
+                },
+                child: Text(
+                  "Contact us",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
               TextButton(
                 child: Text(
                   "Logout",

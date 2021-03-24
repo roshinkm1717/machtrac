@@ -35,7 +35,12 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
           print('User is signed in!');
           User user = FirebaseAuth.instance.currentUser;
           print(user.email);
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => HomeScreen(),),);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (context) => HomeScreen(),
+            ),
+          );
         }
       }
     });
@@ -77,7 +82,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                         ),
                         SizedBox(height: 0),
                         Text(
-                          'From KMCT, Banglore',
+                          'From KMT, Bangalore',
                           style: TextStyle(fontSize: 12),
                         ),
                         SizedBox(height: 20),

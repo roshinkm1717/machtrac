@@ -15,7 +15,22 @@ class MachineInfo extends StatefulWidget {
 }
 
 class _MachineInfoState extends State<MachineInfo> {
-  void _launchMail(bool isDaily) async {
+  void requestReportBoost(bool isDaily) async {
+    var now = DateTime.now();
+    final Uri _emailLaunchUri = Uri(
+      scheme: 'mailto',
+      path: 'harikrishnakv@outlook.com',
+      query:
+          'subject=Request For ${isDaily ? 'Daily' : 'Weekly'} Report Boost up &body= Machine Name : ${widget.doc['name']} \n Machine make : ${widget.doc['make']} \n Fetch link : ${widget.doc['fetchLink']} \n $now', //add subject and body here
+    );
+    try {
+      await launch(_emailLaunchUri.toString());
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void requestReport(bool isDaily) async {
     print(widget.doc.data());
     var now = DateTime.now();
     final Uri _emailLaunchUri = Uri(
@@ -49,11 +64,13 @@ class _MachineInfoState extends State<MachineInfo> {
 
   updateReportData(bool isDaily) async {
     String email = FirebaseAuth.instance.currentUser.email;
-    if (isDaily) {
-      remDaily--;
-    } else {
-      remWeekly--;
-    }
+    setState(() {
+      if (isDaily) {
+        remDaily--;
+      } else {
+        remWeekly--;
+      }
+    });
     await FirebaseFirestore.instance.collection('users').doc(email).update({
       'remDaily': remDaily,
       "remWeekly": remWeekly,
@@ -95,25 +112,28 @@ class _MachineInfoState extends State<MachineInfo> {
                   elevation: 10,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(5),
-                    child: ListTile(
-                      tileColor:
-                          widget.status.data == null ? Colors.red.shade800 : (widget.status.data ? Colors.green.shade800 : Colors.yellow.shade800),
-                      contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                      leading: Container(
-                        height: 100,
-                        width: 100,
-                        child: Image(
-                          image: NetworkImage(widget.doc['imageUrl']),
-                          fit: BoxFit.cover,
+                    child: AnimatedContainer(
+                      duration: Duration(milliseconds: 500),
+                      child: ListTile(
+                        tileColor:
+                            widget.status.data == null ? Colors.red.shade800 : (widget.status.data ? Colors.green.shade800 : Colors.yellow.shade800),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        leading: Container(
+                          height: 100,
+                          width: 100,
+                          child: Image(
+                            image: NetworkImage(widget.doc['imageUrl']),
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                      title: Text(
-                        widget.doc['name'],
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      subtitle: Text(
-                        "${widget.status.data == null ? 'Error' : (widget.status.data == false ? 'Idle' : 'Running')}",
-                        style: TextStyle(color: Colors.white),
+                        title: Text(
+                          widget.doc['name'],
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        subtitle: Text(
+                          "${widget.status.data == null ? 'Error' : (widget.status.data == false ? 'Idle' : 'Running')}",
+                          style: TextStyle(color: Colors.white),
+                        ),
                       ),
                     ),
                   ),
@@ -147,16 +167,24 @@ class _MachineInfoState extends State<MachineInfo> {
                               child: Text("Daily"),
                               onPressed: () {
                                 //daily report
-                                updateReportData(true);
-                                remDaily + 1 > 0 ? _launchMail(true) : Navigator.pop(context);
+                                if (remDaily > 0) {
+                                  updateReportData(true);
+                                  requestReport(true);
+                                } else {
+                                  Navigator.pop(context);
+                                }
                               },
                             ),
                             TextButton(
                               child: Text("Weekly"),
                               onPressed: () {
-                                //weekly report
-                                updateReportData(false);
-                                remWeekly + 1 > 0 ? _launchMail(false) : Navigator.pop(context);
+                                //daily report
+                                if (remWeekly > 0) {
+                                  updateReportData(false);
+                                  requestReport(false);
+                                } else {
+                                  Navigator.pop(context);
+                                }
                               },
                             ),
                             TextButton(
@@ -170,6 +198,40 @@ class _MachineInfoState extends State<MachineInfo> {
                       });
                 },
               ),
+              SizedBox(height: 10),
+              if (remDaily == 0 || remWeekly == 0)
+                TextButton(
+                  onPressed: () {
+                    showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text("Which reports to top up?"),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  requestReportBoost(true);
+                                },
+                                child: Text("Daily"),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  requestReportBoost(false);
+                                },
+                                child: Text("Weekly"),
+                              ),
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Text("Cancel"),
+                              ),
+                            ],
+                          );
+                        });
+                  },
+                  child: Text("Request Report Top up"),
+                ),
             ],
           ),
         ),

@@ -171,6 +171,7 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               icon: Icon(
                                 Icons.check_circle_outline_rounded,
                                 color: (_link ?? false) ? Colors.green : Colors.red,
+                                size: 32,
                               ),
                               focusColor: (_link ?? false) ? Colors.green : Colors.red,
                               color: (_link ?? false) ? Colors.green : Colors.red,
@@ -178,6 +179,22 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                           ],
                         ),
                         SizedBox(height: 10),
+                        Text("Or"),
+                        SizedBox(height: 10),
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                color: Colors.blue,
+                              ),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                          onPressed: () async {
+                            //scan QR
+                          },
+                          child: Text("Scan QR"),
+                        ),
                         TextFormField(
                           decoration: InputDecoration(
                             labelText: "Capacity",
@@ -190,13 +207,29 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                           validator: RequiredValidator(errorText: "Cannot be empty"),
                         ),
                         SizedBox(height: 20),
-                        TextButton(
-                          style: TextButton.styleFrom(side: BorderSide(color: Colors.blue)),
-                          onPressed: () {
-                            //select image
-                            getImage();
-                          },
-                          child: Text(machine.imageName == null ? "Select image" : machine.imageName),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.camera_alt,
+                                color: Colors.blue,
+                              ),
+                              onPressed: () {
+                                //launch camera
+                              },
+                            ),
+                            SizedBox(width: 10),
+                            Text("Or"),
+                            SizedBox(width: 10),
+                            TextButton(
+                              style: TextButton.styleFrom(side: BorderSide(color: Colors.blue)),
+                              onPressed: () {
+                                //select image
+                                getImage();
+                              },
+                              child: Text(machine.imageName == null ? "Select image" : machine.imageName),
+                            ),
+                          ],
                         ),
                         SizedBox(height: 10),
                         Row(
