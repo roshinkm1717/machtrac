@@ -56,6 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ad: _ad,
         ),
         width: _ad.size.width.toDouble(),
+        height: _ad.size.height.toDouble(),
         alignment: Alignment.center,
       );
     }
