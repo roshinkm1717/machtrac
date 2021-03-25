@@ -26,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     getUserImage();
+    MobileAds.instance.initialize();
     _ad = BannerAd(
         size: AdSize.banner,
         adUnitId: "ca-app-pub-6444959581499725/8160194844",
@@ -60,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
         alignment: Alignment.center,
       );
     } else {
-      return CircularProgressIndicator();
+      return Container(color: Colors.grey, child: Center(child: CircularProgressIndicator()));
     }
   }
 
@@ -243,58 +244,69 @@ class _HomeScreenState extends State<HomeScreen> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     final List<DocumentSnapshot> documents = snapshot.data.docs;
-                    return ListView(
-                        children: documents.map((doc) {
-                      return FutureBuilder(
-                        future: machine.getMachineStatus(doc['fetchLink']),
-                        builder: (context, status) {
-                          return GestureDetector(
-                            onTap: () {
-                              //machine info
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MachineInfo(
-                                    doc: doc,
-                                    status: status,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Hero(
-                              tag: doc['name'],
-                              child: Card(
-                                elevation: 5,
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(5),
-                                  child: ListTile(
-                                    tileColor:
-                                        status.data == null ? Colors.red.shade800 : (status.data ? Colors.green.shade800 : Colors.yellow.shade800),
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                                    leading: Container(
-                                      height: 100,
-                                      width: 100,
-                                      child: Image(
-                                        image: NetworkImage(doc['imageUrl']),
-                                        fit: BoxFit.cover,
+                    return Column(
+                      children: [
+                        Expanded(
+                          child: ListView(
+                              children: documents.map((doc) {
+                            return FutureBuilder(
+                              future: machine.getMachineStatus(doc['fetchLink']),
+                              builder: (context, status) {
+                                return GestureDetector(
+                                  onTap: () {
+                                    //machine info
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => MachineInfo(
+                                          doc: doc,
+                                          status: status,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Hero(
+                                    tag: doc['name'],
+                                    child: Card(
+                                      elevation: 5,
+                                      child: ClipRRect(
+                                        borderRadius: BorderRadius.circular(5),
+                                        child: ListTile(
+                                          tileColor: status.data == null
+                                              ? Colors.red.shade800
+                                              : (status.data ? Colors.green.shade800 : Colors.yellow.shade800),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                                          leading: Container(
+                                            height: 100,
+                                            width: 100,
+                                            child: Image(
+                                              image: NetworkImage(doc['imageUrl']),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                          title: Text(
+                                            doc['name'],
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                          subtitle: Text(
+                                            "${status.data == null ? 'Error' : (status.data == false ? 'Idle' : 'Running')}",
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                        ),
                                       ),
                                     ),
-                                    title: Text(
-                                      doc['name'],
-                                      style: TextStyle(color: Colors.white),
-                                    ),
-                                    subtitle: Text(
-                                      "${status.data == null ? 'Error' : (status.data == false ? 'Idle' : 'Running')}",
-                                      style: TextStyle(color: Colors.white),
-                                    ),
                                   ),
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    }).toList());
+                                );
+                              },
+                            );
+                          }).toList()),
+                        ),
+                        Container(
+                          height: 200,
+                          child: checkForAd(),
+                        ),
+                      ],
+                    );
                   } else if (snapshot.hasError) {
                     return Text('Its Error!');
                   }

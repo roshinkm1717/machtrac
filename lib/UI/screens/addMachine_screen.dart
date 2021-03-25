@@ -80,6 +80,7 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
   }
 
   var controller = TextEditingController();
+  var linkController = TextEditingController();
   bool _isSaving = false;
   Machine machine = Machine();
   final formKey = GlobalKey<FormState>();
@@ -147,6 +148,7 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                           children: [
                             Expanded(
                               child: TextFormField(
+                                controller: linkController,
                                 decoration: InputDecoration(
                                   labelText: "Fetch link",
                                 ),
@@ -164,6 +166,12 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               onPressed: () async {
                                 if (machine.fetchLink != null) {
                                   try {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("Checking link"),
+                                        duration: Duration(seconds: 1),
+                                      ),
+                                    );
                                     var response = await http.get(Uri.parse(machine.fetchLink));
                                     if (response.statusCode == 400 || response.statusCode == 401 || response.statusCode == 403) {
                                       setState(() {
@@ -207,6 +215,7 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                             String cameraScanResult = await scanner.scan();
                             setState(() {
                               machine.fetchLink = cameraScanResult;
+                              linkController.text = cameraScanResult;
                             });
                           },
                           child: Text("Scan QR"),
