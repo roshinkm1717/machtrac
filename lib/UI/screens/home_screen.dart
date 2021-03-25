@@ -4,7 +4,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:machtrac/UI/screens/addMachine_screen.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -19,54 +18,18 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  BannerAd _ad;
   bool isLoaded;
 
   @override
   void initState() {
     super.initState();
     getUserImage();
-    MobileAds.instance.initialize();
-    _ad = BannerAd(
-        size: AdSize.banner,
-        adUnitId: "ca-app-pub-6444959581499725/8160194844",
-        listener: AdListener(onAdLoaded: (_) {
-          setState(() {
-            isLoaded = true;
-          });
-        }, onAdFailedToLoad: (_, error) {
-          print("Ad failed to load with error: $error");
-        }),
-        request: AdRequest());
-    _ad.load();
     setState(() {});
     checkReportsData();
     _timer();
   }
 
-  @override
-  void dispose() {
-    _ad?.dispose();
-    super.dispose();
-  }
-
-  Widget checkForAd() {
-    if (isLoaded == true) {
-      return Container(
-        child: AdWidget(
-          ad: _ad,
-        ),
-        width: _ad.size.width.toDouble(),
-        height: _ad.size.height.toDouble(),
-        alignment: Alignment.center,
-      );
-    } else {
-      return Container(color: Colors.grey, child: Center(child: CircularProgressIndicator()));
-    }
-  }
-
   void _timer() {
-    print("Fetch data");
     Future.delayed(Duration(seconds: 3)).then((_) {
       setState(() {});
       _timer();
@@ -79,7 +42,9 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() {
         imageUrl = user.photoURL;
       });
-      return;
+      if (imageUrl != null) {
+        return;
+      }
     } catch (e) {
       print(e);
     }
@@ -143,18 +108,20 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    child: imageUrl == null
-                        ? Icon(Icons.person)
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(400),
-                            child: CircleAvatar(
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(100),
+                    child: Container(
+                      child: imageUrl == null
+                          ? Icon(Icons.person)
+                          : Container(
+                              height: 35,
+                              width: 35,
                               child: Image.network(
                                 imageUrl,
                                 fit: BoxFit.cover,
                               ),
                             ),
-                          ),
+                    ),
                   ),
                   SizedBox(width: 10),
                   Text(
@@ -294,7 +261,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                             style: TextStyle(color: Colors.white),
                                           ),
                                           subtitle: Text(
-                                            "${status.data == null ? 'Error' : (status.data == false ? 'Idle' : 'Running')}",
+                                            "${status.data == null ? 'No Signal' : (status.data == false ? 'Idle' : 'Running')}",
                                             style: TextStyle(color: Colors.white),
                                           ),
                                         ),
@@ -307,9 +274,33 @@ class _HomeScreenState extends State<HomeScreen> {
                           }).toList()),
                         ),
                         Container(
-                          margin: EdgeInsets.only(top: 10),
-                          height: 200,
-                          child: checkForAd(),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.blue, width: 4),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          width: double.infinity,
+                          height: 150,
+                          child: Card(
+                            borderOnForeground: true,
+                            elevation: 0,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text("Get to Know Us Better"),
+                                  Text(
+                                    "Honing World",
+                                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 26),
+                                  ),
+                                  Text(
+                                    "From Krishna Machine Tools",
+                                    style: TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
                         ),
                       ],
                     );

@@ -46,15 +46,11 @@ class Machine {
   }
 
   Future<bool> getMachineStatus(String link) async {
-    print("Getting status");
-    var userName = 'Harikrishnakv';
-    var feedId = 'kmt-cnc-lathe';
     var response = await http.get(Uri.parse(link));
-
+    print(response.statusCode);
     if (response.statusCode == 200) {
       var jsonResponse = convert.jsonDecode(response.body);
       var machStatus = jsonResponse[0]['value'];
-
       return machStatus == '10' ? Future.value(true) : Future.value(false);
     } else {
       print('Request failed with status: ${response.statusCode}.');

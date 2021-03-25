@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "882486296953-noplu7nn8pglrv5d4h1kojboo5df8tai.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.machtrac",
+            "certificate_hash": "7d96f6229cbad2160e841fa022d9a3c3e62eb21b"
+          }
+        },
+        {
           "client_id": "882486296953-lpevn7jia981rtdj56ir9s6roqsoki3s.apps.googleusercontent.com",
           "client_type": 3
         }
