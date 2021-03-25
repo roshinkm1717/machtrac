@@ -213,6 +213,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 });
                                 try {
                                   await _googleSignIn.signOut();
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                      MaterialPageRoute(
+                                        builder: (context) => LoginScreen(),
+                                      ),
+                                      (Route<dynamic> route) => false);
                                 } catch (e) {
                                   print(e);
                                 }
@@ -302,6 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           }).toList()),
                         ),
                         Container(
+                          margin: EdgeInsets.only(top: 10),
                           height: 200,
                           child: checkForAd(),
                         ),

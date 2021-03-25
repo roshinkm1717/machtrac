@@ -23,17 +23,14 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   checkIfLoggedIn() async {
-    isSignedIn = await _googleSignIn.isSignedIn();
-    print(isSignedIn);
-    if (!isSignedIn) {
-      print(_googleSignIn.currentUser);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(),
-        ),
-      );
-    }
+    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount account) {
+      setState(() {
+        _currentUser = account;
+      });
+      if (_currentUser != null) {
+        print("Google: $_currentUser");
+      }
+    });
     FirebaseAuth auth = FirebaseAuth.instance;
     setState(() {
       _isSaving = true;
@@ -61,6 +58,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     });
   }
 
+  GoogleSignInAccount _currentUser;
   GoogleSignIn _googleSignIn = GoogleSignIn();
   bool isSignedIn = false;
   bool _isSaving = false;
