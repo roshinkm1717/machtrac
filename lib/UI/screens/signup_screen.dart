@@ -1,11 +1,17 @@
+import 'dart:io';
+
 import 'package:double_back_to_close/double_back_to_close.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:machtrac/Backend/user.dart';
 import 'package:machtrac/UI/screens/home_screen.dart';
 import 'package:machtrac/UI/screens/login_screen.dart';
 import 'package:machtrac/UI/widgets/filled_button.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:path/path.dart';
 
 import '../../constants.dart';
 
@@ -15,6 +21,29 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+  openCamera() async {
+    PickedFile pickedFile = await ImagePicker.platform.pickImage(source: ImageSource.camera, imageQuality: 50);
+    if (pickedFile != null) {
+      setState(() {
+        user.image = File(pickedFile.path);
+        user.imageName = basename(pickedFile.path);
+      });
+    }
+  }
+
+  getImage() async {
+    FilePickerResult result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+      allowMultiple: false,
+    );
+    if (result != null) {
+      setState(() {
+        user.image = File(result.paths[0]);
+        user.imageName = basename(result.paths[0]);
+      });
+    }
+  }
+
   User user = User();
   final formKey = GlobalKey<FormState>();
   bool _isSaving = false;
@@ -129,6 +158,34 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         },
                         validator: RequiredValidator(errorText: "Name cannot be empty"),
                       ),
+                      SizedBox(height: 10),
+                      Row(
+                        children: [
+                          IconButton(
+                            icon: Icon(
+                              Icons.camera_alt,
+                              color: Colors.blue,
+                            ),
+                            onPressed: () {
+                              //launch camera
+                              openCamera();
+                            },
+                          ),
+                          SizedBox(width: 10),
+                          Text("Or"),
+                          SizedBox(width: 10),
+                          Expanded(
+                            child: TextButton(
+                              style: TextButton.styleFrom(side: BorderSide(color: Colors.blue)),
+                              onPressed: () {
+                                //select image
+                                getImage();
+                              },
+                              child: Text(user.imageName == null ? "Profile Picture" : user.imageName),
+                            ),
+                          ),
+                        ],
+                      ),
                       SizedBox(height: 60),
                       Hero(
                         tag: 'button',
@@ -174,6 +231,35 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           );
                         },
                         child: Text('Already have an account? Log in'),
+                      ),
+                      SizedBox(height: 20),
+                      OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 10),
+                        ),
+                        onPressed: () async {
+                          //login with Google
+                          var res = await user.loginWithGoogle();
+                          if (res == null) {
+                            Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                  builder: (context) => HomeScreen(),
+                                ),
+                                (Route<dynamic> route) => false);
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Error occurred. Try email or try again later")),
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          FontAwesomeIcons.google,
+                          color: Colors.blue,
+                        ),
+                        label: Text(
+                          "Sign up with Google",
+                          style: TextStyle(color: Colors.black54),
+                        ),
                       ),
                     ],
                   ),

@@ -2,6 +2,7 @@ import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:machtrac/UI/screens/login_screen.dart';
 import 'package:machtrac/UI/widgets/filled_button.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -22,10 +23,21 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   }
 
   checkIfLoggedIn() async {
+    isSignedIn = await _googleSignIn.isSignedIn();
+    print(isSignedIn);
+    if (!isSignedIn) {
+      print(_googleSignIn.currentUser);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomeScreen(),
+        ),
+      );
+    }
+    FirebaseAuth auth = FirebaseAuth.instance;
     setState(() {
       _isSaving = true;
     });
-    FirebaseAuth auth = FirebaseAuth.instance;
     auth.authStateChanges().listen((User user) {
       if (user == null) {
         print('User is currently signed out!');
@@ -49,6 +61,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
     });
   }
 
+  GoogleSignIn _googleSignIn = GoogleSignIn();
+  bool isSignedIn = false;
   bool _isSaving = false;
 
   @override

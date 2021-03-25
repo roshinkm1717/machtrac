@@ -23,14 +23,16 @@ class _MachineInfoState extends State<MachineInfo> {
     String username = 'machtracorg@gmail.com';
     String password = 'machtrac@google';
     String email = FirebaseAuth.instance.currentUser.email;
+    print(email);
     // ignore: deprecated_member_use
     final smtpServer = gmail(username, password);
 
     final message = Message()
       ..from = Address(username, 'abc')
-      ..recipients.add('nivinanil244@gmail.com')
+      ..recipients.add('roshinkm17@gmail.com')
       ..subject = 'Request For ${isDaily ? 'Daily' : 'Weekly'} Report'
-      ..text = ' Data ';
+      ..text =
+          ' MailID : $email \n Machine Name : ${widget.doc['name']} \n Machine make : ${widget.doc['make']} \n Fetch link : ${widget.doc['fetchLink']} \n $now';
     //TODO: add body for requestReportBoost
 
     try {
@@ -50,13 +52,13 @@ class _MachineInfoState extends State<MachineInfo> {
 
     String username = 'machtracorg@gmail.com';
     String password = 'machtrac@google';
-    String email = FirebaseAuth.instance.currentUser.displayName;
+    String email = FirebaseAuth.instance.currentUser.email;
     // ignore: deprecated_member_use
     final smtpServer = gmail(username, password);
 
     final message = Message()
       ..from = Address(username, 'Machtrac')
-      ..recipients.add('nivinanil244@gmail.com')
+      ..recipients.add('roshinkm17@gmail.com')
       ..subject = 'Request For ${isDaily ? 'Daily' : 'Weekly'} Report'
       ..text =
           ' MailID : $email \n Machine Name : ${widget.doc['name']} \n Machine make : ${widget.doc['make']} \n Fetch link : ${widget.doc['fetchLink']} \n $now';
@@ -91,8 +93,7 @@ class _MachineInfoState extends State<MachineInfo> {
 
   getReportData() async {
     String email = FirebaseAuth.instance.currentUser.email;
-    DocumentSnapshot document =
-        await FirebaseFirestore.instance.collection('users').doc(email).get();
+    DocumentSnapshot document = await FirebaseFirestore.instance.collection('users').doc(email).get();
     print(document.data());
     setState(() {
       remDaily = document.data()['remDaily'];
@@ -153,13 +154,9 @@ class _MachineInfoState extends State<MachineInfo> {
                     child: AnimatedContainer(
                       duration: Duration(milliseconds: 500),
                       child: ListTile(
-                        tileColor: widget.status.data == null
-                            ? Colors.red.shade800
-                            : (widget.status.data
-                                ? Colors.green.shade800
-                                : Colors.yellow.shade800),
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        tileColor:
+                            widget.status.data == null ? Colors.red.shade800 : (widget.status.data ? Colors.green.shade800 : Colors.yellow.shade800),
+                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                         leading: Container(
                           height: 100,
                           width: 100,
@@ -212,6 +209,10 @@ class _MachineInfoState extends State<MachineInfo> {
                                 if (remDaily > 0) {
                                   updateReportData(true);
                                   requestReport(true);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("The request has been sent to Machtrac")),
+                                  );
+                                  Navigator.pop(context);
                                 } else {
                                   Navigator.pop(context);
                                 }
@@ -224,6 +225,10 @@ class _MachineInfoState extends State<MachineInfo> {
                                 if (remWeekly > 0) {
                                   updateReportData(false);
                                   requestReport(false);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("The request has been sent to Machtrac")),
+                                  );
+                                  Navigator.pop(context);
                                 } else {
                                   Navigator.pop(context);
                                 }
@@ -253,12 +258,18 @@ class _MachineInfoState extends State<MachineInfo> {
                               TextButton(
                                 onPressed: () {
                                   requestReportBoost(true);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("The request has been sent to Machtrac")),
+                                  );
                                 },
                                 child: Text("Daily"),
                               ),
                               TextButton(
                                 onPressed: () {
                                   requestReportBoost(false);
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text("The request has been sent to Machtrac")),
+                                  );
                                 },
                                 child: Text("Weekly"),
                               ),

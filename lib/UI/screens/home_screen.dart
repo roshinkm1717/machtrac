@@ -5,6 +5,7 @@ import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:machtrac/UI/screens/addMachine_screen.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
@@ -24,33 +25,32 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _ad=BannerAd(size: AdSize.banner,
+    getUserImage();
+    _ad = BannerAd(
+        size: AdSize.banner,
         adUnitId: "ca-app-pub-6444959581499725/8160194844",
-        listener: AdListener(
-          onAdLoaded: (_){
-            setState(() {
-              isLoaded=true;
-            });
-          },
-          onAdFailedToLoad: (_,error){
-            print("Ad failed to load with error: $error");
-          }
-        ),
+        listener: AdListener(onAdLoaded: (_) {
+          setState(() {
+            isLoaded = true;
+          });
+        }, onAdFailedToLoad: (_, error) {
+          print("Ad failed to load with error: $error");
+        }),
         request: AdRequest());
     _ad.load();
     setState(() {});
     checkReportsData();
     _timer();
   }
+
   @override
-  void dispose(){
+  void dispose() {
     _ad?.dispose();
     super.dispose();
   }
 
-
   Widget checkForAd() {
-    if(isLoaded==true) {
+    if (isLoaded == true) {
       return Container(
         child: AdWidget(
           ad: _ad,
@@ -59,18 +59,33 @@ class _HomeScreenState extends State<HomeScreen> {
         height: _ad.size.height.toDouble(),
         alignment: Alignment.center,
       );
-    }
-    else{
+    } else {
       return CircularProgressIndicator();
     }
-    }
-
+  }
 
   void _timer() {
     print("Fetch data");
     Future.delayed(Duration(seconds: 3)).then((_) {
       setState(() {});
       _timer();
+    });
+  }
+
+  getUserImage() async {
+    try {
+      User user = FirebaseAuth.instance.currentUser;
+      setState(() {
+        imageUrl = user.photoURL;
+      });
+      return;
+    } catch (e) {
+      print(e);
+    }
+    String email = FirebaseAuth.instance.currentUser.email;
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('users').doc(email).get();
+    setState(() {
+      imageUrl = snapshot.data()['imageUrl'];
     });
   }
 
@@ -94,6 +109,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  GoogleSignIn _googleSignIn;
+  String imageUrl;
   bool _isSaving = false;
   var dailyTime, weeklyTime;
   String email = FirebaseAuth.instance.currentUser.email;
@@ -126,7 +143,17 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Row(
                 children: [
                   CircleAvatar(
-                    child: Icon(Icons.person),
+                    child: imageUrl == null
+                        ? Icon(Icons.person)
+                        : ClipRRect(
+                            borderRadius: BorderRadius.circular(400),
+                            child: CircleAvatar(
+                              child: Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          ),
                   ),
                   SizedBox(width: 10),
                   Text(
@@ -183,6 +210,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                 setState(() {
                                   _isSaving = true;
                                 });
+                                try {
+                                  await _googleSignIn.signOut();
+                                } catch (e) {
+                                  print(e);
+                                }
                                 await FirebaseAuth.instance.signOut();
                                 setState(() {
                                   _isSaving = false;

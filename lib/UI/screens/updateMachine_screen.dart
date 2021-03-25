@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:machtrac/Backend/machine.dart';
 import 'package:machtrac/UI/widgets/filled_button.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
@@ -82,11 +84,22 @@ class _UpdateMachineScreenState extends State<UpdateMachineScreen> {
     return await Geolocator.getCurrentPosition();
   }
 
+  openCamera() async {
+    PickedFile pickedFile = await ImagePicker.platform.pickImage(source: ImageSource.camera, imageQuality: 50);
+    if (pickedFile != null) {
+      setState(() {
+        machine.image = File(pickedFile.path);
+        machine.imageName = basename(pickedFile.path);
+      });
+    }
+  }
+
   var controller = TextEditingController();
   String oldName, oldImageName;
   bool _isSaving = false;
   Machine machine = Machine();
   final formKey = GlobalKey<FormState>();
+  bool _link = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -148,19 +161,71 @@ class _UpdateMachineScreenState extends State<UpdateMachineScreen> {
                           validator: RequiredValidator(errorText: "Cannot be empty"),
                         ),
                         SizedBox(height: 10),
-                        TextFormField(
-                          initialValue: machine.fetchLink,
-                          decoration: InputDecoration(
-                            labelText: "Fetch link",
-                          ),
-                          onChanged: (value) {
-                            setState(() {
-                              machine.fetchLink = value;
-                            });
-                          },
-                          validator: RequiredValidator(errorText: "Cannot be empty"),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                initialValue: machine.fetchLink,
+                                decoration: InputDecoration(
+                                  labelText: "Fetch link",
+                                ),
+                                onChanged: (value) {
+                                  setState(() {
+                                    machine.fetchLink = value;
+                                  });
+                                },
+                                validator: RequiredValidator(
+                                  errorText: "Cannot be empty",
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              onPressed: () async {
+                                if (machine.fetchLink != null) {
+                                  try {
+                                    var response = await http.get(Uri.parse(machine.fetchLink));
+                                    if (response.statusCode == 400 || response.statusCode == 401 || response.statusCode == 403) {
+                                      setState(() {
+                                        _link = false;
+                                      });
+                                    } else
+                                      setState(() {
+                                        _link = true;
+                                      });
+                                  } catch (e) {
+                                    setState(() {
+                                      _link = false;
+                                    });
+                                  }
+                                }
+                              },
+                              icon: Icon(
+                                Icons.check_circle_outline_rounded,
+                                color: (_link ?? false) ? Colors.green : Colors.red,
+                                size: 32,
+                              ),
+                              focusColor: (_link ?? false) ? Colors.green : Colors.red,
+                              color: (_link ?? false) ? Colors.green : Colors.red,
+                            ),
+                          ],
                         ),
                         SizedBox(height: 10),
+                        Text("Or"),
+                        SizedBox(height: 10),
+                        TextButton(
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              side: BorderSide(
+                                color: Colors.blue,
+                              ),
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                          ),
+                          onPressed: () async {
+                            //scan QR
+                          },
+                          child: Text("Scan QR"),
+                        ),
                         TextFormField(
                           initialValue: machine.capacity,
                           decoration: InputDecoration(
@@ -177,13 +242,32 @@ class _UpdateMachineScreenState extends State<UpdateMachineScreen> {
                           validator: RequiredValidator(errorText: "Cannot be empty"),
                         ),
                         SizedBox(height: 20),
-                        TextButton(
-                          style: TextButton.styleFrom(side: BorderSide(color: Colors.blue)),
-                          onPressed: () {
-                            //select image
-                            getImage();
-                          },
-                          child: Text(machine.imageName == null ? "Change image" : machine.imageName),
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.camera_alt,
+                                color: Colors.blue,
+                              ),
+                              onPressed: () {
+                                //launch camera
+                                openCamera();
+                              },
+                            ),
+                            SizedBox(width: 10),
+                            Text("Or"),
+                            SizedBox(width: 10),
+                            Expanded(
+                              child: TextButton(
+                                style: TextButton.styleFrom(side: BorderSide(color: Colors.blue)),
+                                onPressed: () {
+                                  //select image
+                                  getImage();
+                                },
+                                child: Text(machine.imageName == null ? "Select image" : machine.imageName),
+                              ),
+                            ),
+                          ],
                         ),
                         SizedBox(height: 10),
                         Row(

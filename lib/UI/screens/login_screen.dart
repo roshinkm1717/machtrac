@@ -1,5 +1,6 @@
 import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:machtrac/Backend/user.dart';
 import 'package:machtrac/UI/screens/forgotPassword_screen.dart';
 import 'package:machtrac/UI/screens/signup_screen.dart';
@@ -138,6 +139,35 @@ class _LoginScreenState extends State<LoginScreen> {
                             );
                           },
                           child: Text('Create a new account?'),
+                        ),
+                        SizedBox(height: 40),
+                        OutlinedButton.icon(
+                          style: OutlinedButton.styleFrom(
+                            padding: EdgeInsets.symmetric(vertical: 10),
+                          ),
+                          onPressed: () async {
+                            //login with Google
+                            var res = await user.loginWithGoogle();
+                            if (res == null) {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                    builder: (context) => HomeScreen(),
+                                  ),
+                                  (Route<dynamic> route) => false);
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text(res.toString())),
+                              );
+                            }
+                          },
+                          icon: Icon(
+                            FontAwesomeIcons.google,
+                            color: Colors.blue,
+                          ),
+                          label: Text(
+                            "Log in with Google",
+                            style: TextStyle(color: Colors.black54),
+                          ),
                         ),
                       ],
                     ),
