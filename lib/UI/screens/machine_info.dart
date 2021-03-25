@@ -4,10 +4,12 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:machtrac/UI/screens/updateMachine_screen.dart';
 import 'package:machtrac/UI/widgets/filled_button.dart';
-import 'package:url_launcher/url_launcher.dart';
+import 'package:mailer/mailer.dart';
+import 'package:mailer/smtp_server.dart';
 
 class MachineInfo extends StatefulWidget {
   MachineInfo({this.doc, this.status});
+
   final QueryDocumentSnapshot doc;
   final AsyncSnapshot<dynamic> status;
   @override
@@ -17,33 +19,68 @@ class MachineInfo extends StatefulWidget {
 class _MachineInfoState extends State<MachineInfo> {
   void requestReportBoost(bool isDaily) async {
     var now = DateTime.now();
-    final Uri _emailLaunchUri = Uri(
-      scheme: 'mailto',
-      path: 'harikrishnakv@outlook.com',
-      query:
-          'subject=Request For ${isDaily ? 'Daily' : 'Weekly'} Report Boost up &body= Machine Name : ${widget.doc['name']} \n Machine make : ${widget.doc['make']} \n Fetch link : ${widget.doc['fetchLink']} \n $now', //add subject and body here
-    );
+
+    String username = 'machtracorg@gmail.com';
+    String password = 'machtrac@google';
+    String email = FirebaseAuth.instance.currentUser.email;
+    // ignore: deprecated_member_use
+    final smtpServer = gmail(username, password);
+
+    final message = Message()
+      ..from = Address(username, 'abc')
+      ..recipients.add('nivinanil244@gmail.com')
+      ..subject = 'Request For ${isDaily ? 'Daily' : 'Weekly'} Report'
+      ..text = ' Data ';
+    //TODO: add body for requestReportBoost
+
     try {
-      await launch(_emailLaunchUri.toString());
-    } catch (e) {
-      print(e);
+      final sendReport = await send(message, smtpServer);
+      print('Message sent: ' + sendReport.toString());
+    } on MailerException catch (e) {
+      print('Message not sent.');
+      for (var p in e.problems) {
+        print('Problem: ${p.code}: ${p.msg}');
+      }
     }
   }
 
   void requestReport(bool isDaily) async {
     print(widget.doc.data());
     var now = DateTime.now();
-    final Uri _emailLaunchUri = Uri(
+
+    String username = 'machtracorg@gmail.com';
+    String password = 'machtrac@google';
+    String email = FirebaseAuth.instance.currentUser.displayName;
+    // ignore: deprecated_member_use
+    final smtpServer = gmail(username, password);
+
+    final message = Message()
+      ..from = Address(username, 'Machtrac')
+      ..recipients.add('nivinanil244@gmail.com')
+      ..subject = 'Request For ${isDaily ? 'Daily' : 'Weekly'} Report'
+      ..text =
+          ' MailID : $email \n Machine Name : ${widget.doc['name']} \n Machine make : ${widget.doc['make']} \n Fetch link : ${widget.doc['fetchLink']} \n $now';
+
+    try {
+      final sendReport = await send(message, smtpServer);
+      print('Message sent: ' + sendReport.toString());
+    } on MailerException catch (e) {
+      print('Message not sent.');
+      for (var p in e.problems) {
+        print('Problem: ${p.code}: ${p.msg}');
+      }
+    }
+    /*final Uri _emailLaunchUri = Uri(
       scheme: 'mailto',
       path: 'harikrishnakv@outlook.com',
       query:
           'subject=Request For ${isDaily ? 'Daily' : 'Weekly'} Report  &body= Machine Name : ${widget.doc['name']} \n Machine make : ${widget.doc['make']} \n Fetch link : ${widget.doc['fetchLink']} \n $now', //add subject and body here
-    );
-    try {
+    );*/
+    /*try {
       await launch(_emailLaunchUri.toString());
     } catch (e) {
       print(e);
-    }
+    }*/
   }
 
   @override
@@ -54,7 +91,8 @@ class _MachineInfoState extends State<MachineInfo> {
 
   getReportData() async {
     String email = FirebaseAuth.instance.currentUser.email;
-    DocumentSnapshot document = await FirebaseFirestore.instance.collection('users').doc(email).get();
+    DocumentSnapshot document =
+        await FirebaseFirestore.instance.collection('users').doc(email).get();
     print(document.data());
     setState(() {
       remDaily = document.data()['remDaily'];
@@ -115,9 +153,13 @@ class _MachineInfoState extends State<MachineInfo> {
                     child: AnimatedContainer(
                       duration: Duration(milliseconds: 500),
                       child: ListTile(
-                        tileColor:
-                            widget.status.data == null ? Colors.red.shade800 : (widget.status.data ? Colors.green.shade800 : Colors.yellow.shade800),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                        tileColor: widget.status.data == null
+                            ? Colors.red.shade800
+                            : (widget.status.data
+                                ? Colors.green.shade800
+                                : Colors.yellow.shade800),
+                        contentPadding:
+                            EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                         leading: Container(
                           height: 100,
                           width: 100,

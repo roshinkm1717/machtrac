@@ -23,7 +23,6 @@ dependencies:
   geocoding:
   geolocator:
   url_launcher: ^6.0.2
-  google_mobile_ads: ^0.11.0+4
 
 dev_dependencies:
   flutter_test:

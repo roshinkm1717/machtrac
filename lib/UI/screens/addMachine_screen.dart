@@ -12,6 +12,7 @@ import 'package:machtrac/Backend/machine.dart';
 import 'package:machtrac/UI/widgets/filled_button.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path/path.dart';
+import 'package:qrscan/qrscan.dart' as scanner;
 
 import 'home_screen.dart';
 
@@ -31,7 +32,8 @@ Future<Position> _determinePosition() async {
     permission = await Geolocator.requestPermission();
     if (permission == LocationPermission.deniedForever) {
       // Permissions are denied forever, handle appropriately.
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
+      return Future.error(
+          'Location permissions are permanently denied, we cannot request permissions.');
     }
     if (permission == LocationPermission.denied) {
       // Permissions are denied, next time you could try
@@ -102,7 +104,8 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               machine.name = value;
                             });
                           },
-                          validator: RequiredValidator(errorText: "Cannot be empty"),
+                          validator:
+                              RequiredValidator(errorText: "Cannot be empty"),
                         ),
                         SizedBox(height: 10),
                         TextFormField(
@@ -115,7 +118,8 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               machine.make = value;
                             });
                           },
-                          validator: RequiredValidator(errorText: "Cannot be empty"),
+                          validator:
+                              RequiredValidator(errorText: "Cannot be empty"),
                         ),
                         SizedBox(height: 10),
                         TextFormField(
@@ -128,7 +132,8 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               machine.manYear = int.parse(value);
                             });
                           },
-                          validator: RequiredValidator(errorText: "Cannot be empty"),
+                          validator:
+                              RequiredValidator(errorText: "Cannot be empty"),
                         ),
                         SizedBox(height: 10),
                         Row(
@@ -152,8 +157,11 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               onPressed: () async {
                                 if (machine.fetchLink != null) {
                                   try {
-                                    var response = await http.get(Uri.parse(machine.fetchLink));
-                                    if (response.statusCode == 400 || response.statusCode == 401 || response.statusCode == 403) {
+                                    var response = await http
+                                        .get(Uri.parse(machine.fetchLink));
+                                    if (response.statusCode == 400 ||
+                                        response.statusCode == 401 ||
+                                        response.statusCode == 403) {
                                       setState(() {
                                         _link = false;
                                       });
@@ -170,11 +178,15 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               },
                               icon: Icon(
                                 Icons.check_circle_outline_rounded,
-                                color: (_link ?? false) ? Colors.green : Colors.red,
+                                color: (_link ?? false)
+                                    ? Colors.green
+                                    : Colors.red,
                                 size: 32,
                               ),
-                              focusColor: (_link ?? false) ? Colors.green : Colors.red,
-                              color: (_link ?? false) ? Colors.green : Colors.red,
+                              focusColor:
+                                  (_link ?? false) ? Colors.green : Colors.red,
+                              color:
+                                  (_link ?? false) ? Colors.green : Colors.red,
                             ),
                           ],
                         ),
@@ -192,6 +204,10 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                           ),
                           onPressed: () async {
                             //scan QR
+                            String cameraScanResult = await scanner.scan();
+                            setState(() {
+                              machine.fetchLink = cameraScanResult;
+                            });
                           },
                           child: Text("Scan QR"),
                         ),
@@ -204,7 +220,8 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               machine.capacity = value;
                             });
                           },
-                          validator: RequiredValidator(errorText: "Cannot be empty"),
+                          validator:
+                              RequiredValidator(errorText: "Cannot be empty"),
                         ),
                         SizedBox(height: 20),
                         Row(
@@ -222,12 +239,15 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                             Text("Or"),
                             SizedBox(width: 10),
                             TextButton(
-                              style: TextButton.styleFrom(side: BorderSide(color: Colors.blue)),
+                              style: TextButton.styleFrom(
+                                  side: BorderSide(color: Colors.blue)),
                               onPressed: () {
                                 //select image
                                 getImage();
                               },
-                              child: Text(machine.imageName == null ? "Select image" : machine.imageName),
+                              child: Text(machine.imageName == null
+                                  ? "Select image"
+                                  : machine.imageName),
                             ),
                           ],
                         ),
@@ -246,18 +266,25 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                                     machine.location = value;
                                   });
                                 },
-                                validator: RequiredValidator(errorText: "Cannot be empty"),
+                                validator: RequiredValidator(
+                                    errorText: "Cannot be empty"),
                               ),
                             ),
                             IconButton(
                               icon: Icon(Icons.location_searching),
                               onPressed: () async {
                                 Position location = await _determinePosition();
-                                List<Placemark> placeMarks = await placemarkFromCoordinates(location.latitude, location.longitude);
+                                List<Placemark> placeMarks =
+                                    await placemarkFromCoordinates(
+                                        location.latitude, location.longitude);
                                 print(placeMarks[0].locality);
                                 setState(() {
                                   loc = true;
-                                  machine.location = placeMarks[0].locality + "," + placeMarks[0].administrativeArea + "," + placeMarks[0].country;
+                                  machine.location = placeMarks[0].locality +
+                                      "," +
+                                      placeMarks[0].administrativeArea +
+                                      "," +
+                                      placeMarks[0].country;
                                   controller.text = machine.location;
                                   print(machine.location);
                                 });
@@ -280,14 +307,16 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                                   setState(() {
                                     _isSaving = true;
                                   });
-                                  var res = await machine.uploadMachineData(machine);
+                                  var res =
+                                      await machine.uploadMachineData(machine);
                                   setState(() {
                                     _isSaving = false;
                                   });
                                   if (res != null) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
-                                        content: Text("Error uploading data. Try again"),
+                                        content: Text(
+                                            "Error uploading data. Try again"),
                                       ),
                                     );
                                   } else {
@@ -301,7 +330,8 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                                 } else {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text("Please check the fetch link and try again"),
+                                      content: Text(
+                                          "Please check the fetch link and try again"),
                                     ),
                                   );
                                 }
