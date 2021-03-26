@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:machtrac/UI/screens/addMachine_screen.dart';
+import 'package:machtrac/UI/widgets/filled_button.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -143,8 +144,61 @@ class _HomeScreenState extends State<HomeScreen> {
                       builder: (BuildContext context) {
                         return AlertDialog(
                           title: Text("KMT, Bangalore"),
-                          content: Text(
-                              "Harikrishna K V | 966333007 | harikrishnakv@outlook.com"),
+                          content: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text("  Harikrishna K V"),
+                              TextButton(
+                                onPressed: () async {
+                                  try {
+                                    launch('tel: 966333007');
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                                child: Text(
+                                  'Ph: 966333007',
+                                  style: TextStyle(color: Colors.blue),
+                                ),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  final Uri _emailLaunchUri = Uri(
+                                    scheme: 'mailto',
+                                    path: 'harikrishnakv@outlook.com',
+                                    query:
+                                        'subject=Report Issues', //add subject and body here
+                                  );
+                                  try {
+                                    await launch(_emailLaunchUri.toString());
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                                child: Text(
+                                  'harikrishnakv@outlook.com',
+                                  style: TextStyle(color: Colors.blue),
+                                ),
+                              ),
+                              FilledButton(
+                                onPressed: () async {
+                                  final Uri _emailLaunchUri = Uri(
+                                    scheme: 'mailto',
+                                    path: 'harikrishnakv@outlook.com',
+                                    query:
+                                        'subject=Report Issues', //add subject and body here
+                                  );
+                                  try {
+                                    await launch(_emailLaunchUri.toString());
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                                text: 'Report Issues',
+                              ),
+                            ],
+                          ),
                           actions: [
                             TextButton(
                                 onPressed: () {
