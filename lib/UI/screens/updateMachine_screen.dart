@@ -12,6 +12,7 @@ import 'package:machtrac/Backend/machine.dart';
 import 'package:machtrac/UI/widgets/filled_button.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path/path.dart';
+import 'package:qrscan/qrscan.dart' as scanner;
 
 import 'home_screen.dart';
 
@@ -49,6 +50,7 @@ class _UpdateMachineScreenState extends State<UpdateMachineScreen> {
       oldImageName = widget.doc['imageName'];
       machine.location = widget.doc['location'];
       controller.text = machine.location;
+      linkController.text = machine.fetchLink;
     });
   }
 
@@ -94,6 +96,7 @@ class _UpdateMachineScreenState extends State<UpdateMachineScreen> {
     }
   }
 
+  var linkController = TextEditingController();
   var controller = TextEditingController();
   String oldName, oldImageName;
   bool _isSaving = false;
@@ -165,7 +168,7 @@ class _UpdateMachineScreenState extends State<UpdateMachineScreen> {
                           children: [
                             Expanded(
                               child: TextFormField(
-                                initialValue: machine.fetchLink,
+                                controller: linkController,
                                 decoration: InputDecoration(
                                   labelText: "Fetch link",
                                 ),
@@ -183,6 +186,11 @@ class _UpdateMachineScreenState extends State<UpdateMachineScreen> {
                               onPressed: () async {
                                 if (machine.fetchLink != null) {
                                   try {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(
+                                        content: Text("Checking link..."),
+                                      ),
+                                    );
                                     var response = await http.get(Uri.parse(machine.fetchLink));
                                     if (response.statusCode == 400 || response.statusCode == 401 || response.statusCode == 403) {
                                       setState(() {
@@ -223,6 +231,11 @@ class _UpdateMachineScreenState extends State<UpdateMachineScreen> {
                           ),
                           onPressed: () async {
                             //scan QR
+                            String cameraScanResult = await scanner.scan();
+                            setState(() {
+                              machine.fetchLink = cameraScanResult;
+                              linkController.text = cameraScanResult;
+                            });
                           },
                           child: Text("Scan QR"),
                         ),

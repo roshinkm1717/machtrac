@@ -23,8 +23,6 @@ class User {
     }
   }
 
-  signUpWithGoogle() async {}
-
   loginWithGoogle() async {
     try {
       GoogleSignIn _googleSignIn = GoogleSignIn();
@@ -40,8 +38,8 @@ class User {
           {
             'remDaily': 100,
             'remWeekly': 25,
-            'dailyTime': DateTime.now().millisecondsSinceEpoch,
-            'weeklyTime': DateTime.now().millisecondsSinceEpoch,
+            'dailyTime': 0,
+            'weeklyTime': 0,
           },
         );
       }
@@ -64,10 +62,12 @@ class User {
   Future uploadDetails(User user) async {
     String email = FirebaseAuth.instance.currentUser.email;
     String downloadUrl;
-    Reference reference = FirebaseStorage.instance.ref('$email/${user.imageName}');
-    try {
+    if (user.image != null) {
+      Reference reference = FirebaseStorage.instance.ref('$email/${user.imageName}');
       await reference.putFile(user.image);
       downloadUrl = await reference.getDownloadURL();
+    }
+    try {
       await FirebaseFirestore.instance.collection('users').doc(user.email).set(
         {
           'imageUrl': downloadUrl,
@@ -75,8 +75,8 @@ class User {
           'mobile': user.mobile,
           'remDaily': 100,
           'remWeekly': 25,
-          'dailyTime': DateTime.now().millisecondsSinceEpoch,
-          'weeklyTime': DateTime.now().millisecondsSinceEpoch,
+          'dailyTime': 0,
+          'weeklyTime': 0,
         },
       );
     } catch (e) {

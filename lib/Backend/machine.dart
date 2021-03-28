@@ -51,7 +51,13 @@ class Machine {
     if (response.statusCode == 200) {
       var jsonResponse = convert.jsonDecode(response.body);
       var machStatus = jsonResponse[0]['value'];
-      return machStatus == '10' ? Future.value(true) : Future.value(false);
+      if (machStatus == '10') {
+        return Future.value(true);
+      } else if (machStatus == '5') {
+        return Future.value(false);
+      } else {
+        return Future.value(null);
+      }
     } else {
       print('Request failed with status: ${response.statusCode}.');
       return Future.value(false);

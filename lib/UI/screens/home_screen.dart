@@ -6,7 +6,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:machtrac/UI/screens/addMachine_screen.dart';
-import 'package:machtrac/UI/widgets/filled_button.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -27,7 +26,6 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     getUserImage();
     setState(() {});
-    checkReportsData();
     _timer();
   }
 
@@ -51,35 +49,12 @@ class _HomeScreenState extends State<HomeScreen> {
       print(e);
     }
     String email = FirebaseAuth.instance.currentUser.email;
-    DocumentSnapshot snapshot =
-        await FirebaseFirestore.instance.collection('users').doc(email).get();
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('users').doc(email).get();
     setState(() {
       imageUrl = snapshot.data()['imageUrl'];
     });
   }
 
-  checkReportsData() async {
-    String email = FirebaseAuth.instance.currentUser.email;
-    DocumentReference reference =
-        FirebaseFirestore.instance.collection('users').doc(email);
-    DocumentSnapshot document = await reference.get();
-    dailyTime = document.data()['dailyTime'];
-    weeklyTime = document.data()['weeklyTime'];
-    if (DateTime.now().millisecondsSinceEpoch > (dailyTime + 86400000)) {
-      await reference.update({
-        'remDaily': 100,
-        'dailyTime': dailyTime + 86400000,
-      });
-    }
-    if (DateTime.now().millisecondsSinceEpoch > (dailyTime + (86400000 * 7))) {
-      await reference.update({
-        'remWeekly': 100,
-        'weeklyTime': (dailyTime + (86400000 * 7)),
-      });
-    }
-  }
-
-  String _url = 'http://honingworld.com/';
   GoogleSignIn _googleSignIn;
   String imageUrl;
   bool _isSaving = false;
@@ -96,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
         progressIndicator: CircularProgressIndicator(),
         child: Scaffold(
           floatingActionButton: FloatingActionButton(
+            elevation: 4,
             heroTag: 'button',
             child: Icon(Icons.add),
             onPressed: () {
@@ -152,13 +128,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               TextButton(
                                 onPressed: () async {
                                   try {
-                                    launch('tel: 966333007');
+                                    launch('tel: 9663330007');
                                   } catch (e) {
                                     print(e);
                                   }
                                 },
                                 child: Text(
-                                  'Ph: 966333007',
+                                  'Ph: 9663330007',
                                   style: TextStyle(color: Colors.blue),
                                 ),
                               ),
@@ -167,8 +143,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   final Uri _emailLaunchUri = Uri(
                                     scheme: 'mailto',
                                     path: 'harikrishnakv@outlook.com',
-                                    query:
-                                        'subject=Report Issues', //add subject and body here
+                                    query: 'subject=Report Issues', //add subject and body here
                                   );
                                   try {
                                     await launch(_emailLaunchUri.toString());
@@ -181,13 +156,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                   style: TextStyle(color: Colors.blue),
                                 ),
                               ),
-                              FilledButton(
+                              ElevatedButton(
                                 onPressed: () async {
                                   final Uri _emailLaunchUri = Uri(
                                     scheme: 'mailto',
                                     path: 'harikrishnakv@outlook.com',
-                                    query:
-                                        'subject=Report Issues', //add subject and body here
+                                    query: 'subject=Report Issues', //add subject and body here
                                   );
                                   try {
                                     await launch(_emailLaunchUri.toString());
@@ -195,7 +169,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                     print(e);
                                   }
                                 },
-                                text: 'Report Issues',
+                                child: Text('Report Issues'),
                               ),
                             ],
                           ),
@@ -270,12 +244,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Padding(
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               child: FutureBuilder<QuerySnapshot>(
-                future: FirebaseFirestore.instance
-                    .collection('users')
-                    .doc(email)
-                    .collection('machines')
-                    .orderBy('timestamp', descending: true)
-                    .get(),
+                future: FirebaseFirestore.instance.collection('users').doc(email).collection('machines').orderBy('timestamp', descending: true).get(),
                 // ignore: missing_return
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
@@ -286,8 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           child: ListView(
                               children: documents.map((doc) {
                             return FutureBuilder(
-                              future:
-                                  machine.getMachineStatus(doc['fetchLink']),
+                              future: machine.getMachineStatus(doc['fetchLink']),
                               builder: (context, status) {
                                 return GestureDetector(
                                   onTap: () {
@@ -311,29 +279,23 @@ class _HomeScreenState extends State<HomeScreen> {
                                         child: ListTile(
                                           tileColor: status.data == null
                                               ? Colors.red.shade800
-                                              : (status.data
-                                                  ? Colors.green.shade800
-                                                  : Colors.yellow.shade800),
-                                          contentPadding: EdgeInsets.symmetric(
-                                              horizontal: 20, vertical: 15),
+                                              : (status.data ? Colors.green.shade800 : Colors.yellow.shade800),
+                                          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                                           leading: Container(
                                             height: 100,
                                             width: 100,
                                             child: Image(
-                                              image:
-                                                  NetworkImage(doc['imageUrl']),
+                                              image: NetworkImage(doc['imageUrl']),
                                               fit: BoxFit.cover,
                                             ),
                                           ),
                                           title: Text(
                                             doc['name'],
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                            style: TextStyle(color: Colors.white),
                                           ),
                                           subtitle: Text(
                                             "${status.data == null ? 'No Signal' : (status.data == false ? 'Idle' : 'Running')}",
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                            style: TextStyle(color: Colors.white),
                                           ),
                                         ),
                                       ),
@@ -343,48 +305,6 @@ class _HomeScreenState extends State<HomeScreen> {
                               },
                             );
                           }).toList()),
-                        ),
-                        GestureDetector(
-                          onTap: () async {
-                            await canLaunch(_url)
-                                ? await launch(_url)
-                                : throw 'Could not launch $_url';
-                          },
-                          child: Container(
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.blue, width: 4),
-                              borderRadius: BorderRadius.circular(15),
-                            ),
-                            width: double.infinity,
-                            height: 150,
-                            child: Card(
-                              borderOnForeground: true,
-                              elevation: 0,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 20, vertical: 10),
-                                child: Column(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    Text("Get to Know Us Better"),
-                                    Text(
-                                      "Honing World",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 26),
-                                    ),
-                                    Text(
-                                      "From Krishna Machine Tools",
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                          fontSize: 18),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ),
                         ),
                       ],
                     );

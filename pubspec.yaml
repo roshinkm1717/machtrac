@@ -22,7 +22,8 @@ dependencies:
   http:
   geocoding:
   geolocator:
-  url_launcher: ^6.0.2
+  url_launcher:
+  shared_preferences:
   image_picker: any
   google_sign_in: any
   font_awesome_flutter: ^9.0.0

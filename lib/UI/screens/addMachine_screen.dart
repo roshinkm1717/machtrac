@@ -100,6 +100,7 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
               child: Form(
                 key: formKey,
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Column(
