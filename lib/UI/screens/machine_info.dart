@@ -65,7 +65,7 @@ class _MachineInfoState extends State<MachineInfo> {
 
     final message = Message()
       ..from = Address(username, 'Machtrac')
-      ..recipients.add('harikrishnakv@gmail.com')
+      ..recipients.add('machtrac.kmt@outlook.com')
       ..subject = 'Request For ${isDaily ? 'Daily' : '7 Day Report'} Report Boost'
       ..text =
           ' MailID : $email \n Machine Name : ${widget.doc['name']} \n Machine make : ${widget.doc['make']} \n Fetch link : ${widget.doc['fetchLink']} \n $now';
@@ -93,8 +93,8 @@ class _MachineInfoState extends State<MachineInfo> {
 
     final message = Message()
       ..from = Address(username, 'Machtrac')
-      ..recipients.add('harikrishnakv@gmail.com')
-      ..subject = 'Request For ${isDaily ? 'Daily' : '7 Day Report'} Report Boost'
+      ..recipients.add('machtrac.kmt@outlook.com')
+      ..subject = 'Request For ${isDaily ? 'Daily' : '7 Day'} Report'
       ..text =
           ' MailID : $email \n Machine Name : ${widget.doc['name']} \n Machine make : ${widget.doc['make']} \n Fetch link : ${widget.doc['fetchLink']} \n $now';
 
@@ -134,20 +134,22 @@ class _MachineInfoState extends State<MachineInfo> {
 
   updateReportData(bool isDaily) async {
     String email = FirebaseAuth.instance.currentUser.email;
-    setState(() {
+    setState(() async {
       if (isDaily) {
         remDaily--;
         dailyTime = DateTime.now().millisecondsSinceEpoch;
+        await FirebaseFirestore.instance.collection('users').doc(email).update({
+          'remDaily': remDaily,
+          "dailyTime": dailyTime,
+        });
       } else {
         remWeekly--;
         weeklyTime = DateTime.now().millisecondsSinceEpoch;
+        await FirebaseFirestore.instance.collection('users').doc(email).update({
+          "remWeekly": remWeekly,
+          "weeklyTime": weeklyTime,
+        });
       }
-    });
-    await FirebaseFirestore.instance.collection('users').doc(email).update({
-      'remDaily': remDaily,
-      "remWeekly": remWeekly,
-      "dailyTime": dailyTime,
-      "weeklyTime": weeklyTime,
     });
     setState(() {
       if (isDaily) {
@@ -254,7 +256,8 @@ class _MachineInfoState extends State<MachineInfo> {
                                 onPressed: () {
                                   //daily report
                                   if (dailyTime != 0) {
-                                    if (DateTime.now().difference(dailyTime).inDays == 0) {
+                                    print(dailyTime);
+                                    if (dailyTime == null || DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(dailyTime)).inDays == 0) {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: Text("Already requested for Today"),
@@ -298,7 +301,7 @@ class _MachineInfoState extends State<MachineInfo> {
                                 onPressed: () {
                                   //daily report
                                   if (weeklyTime != 0) {
-                                    if (DateTime.now().difference(weeklyTime).inDays == 0) {
+                                    if (dailyTime == null || DateTime.now().difference(DateTime.fromMillisecondsSinceEpoch(weeklyTime)).inDays == 0) {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
                                           content: Text("Already requested for Today"),
