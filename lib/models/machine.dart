@@ -47,7 +47,6 @@ class Machine {
 
   Future<bool> getMachineStatus(String link) async {
     var response = await http.get(Uri.parse(link));
-    print(response.statusCode);
     if (response.statusCode == 200) {
       var jsonResponse = convert.jsonDecode(response.body);
       var machStatus = jsonResponse[0]['value'];

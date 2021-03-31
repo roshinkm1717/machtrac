@@ -3,17 +3,21 @@ import 'dart:io';
 import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:machtrac/Backend/user.dart';
-import 'package:machtrac/UI/screens/home_screen.dart';
-import 'package:machtrac/UI/screens/login_screen.dart';
-import 'package:machtrac/UI/widgets/filled_button.dart';
+import 'package:machtrac/models/user.dart';
+import 'package:machtrac/screens/home_screen.dart';
+import 'package:machtrac/screens/login_screen.dart';
+import 'package:machtrac/widgets/components/snackbar.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path/path.dart';
 
-import '../../constants.dart';
+import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/google_button.dart';
+import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/primary_button.dart';
+import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/secondary_button.dart';
+import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/components/inputField.dart';
+
+import '../constants.dart';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -76,42 +80,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         style: TextStyle(fontSize: 22),
                       ),
                       SizedBox(height: 60),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: "Email",
-                        ),
-                        onChanged: (value) {
-                          setState(() {
-                            user.email = value;
-                          });
-                        },
+                      InputField(
+                        labelText: "Email",
+                        keyboardType: TextInputType.emailAddress,
                         validator: emailValidator,
-                      ),
-                      SizedBox(height: 10),
-                      TextFormField(
-                        obscureText: pass,
-                        decoration: InputDecoration(
-                          labelText: "Password",
-                          suffix: GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                pass = !pass;
-                              });
-                            },
-                            child: Icon(
-                              Icons.visibility,
-                              size: 18,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        ),
                         onChanged: (value) {
-                          setState(() {
-                            user.password = value;
-                          });
+                          user.email = value;
+                        },
+                      ), //email field
+                      SizedBox(height: 10),
+                      InputField(
+                        labelText: "Password",
+                        obscureText: pass,
+                        onChanged: (value) {
+                          user.password = value;
                         },
                         validator: passwordValidator,
-                      ),
+                        onIconTap: () {
+                          setState(() {
+                            pass = !pass;
+                          });
+                        },
+                      ), //password field
                       SizedBox(height: 10),
                       TextFormField(
                         obscureText: confirmPass,
@@ -132,32 +122,22 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         onChanged: (value) {},
                         validator: (val) => MatchValidator(errorText: 'Passwords do not match').validateMatch(val, user.password),
-                      ),
+                      ), //confirm password field
                       SizedBox(height: 10),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: "Mobile",
-                        ),
+                      InputField(
+                        labelText: "Mobile",
                         keyboardType: TextInputType.number,
                         onChanged: (value) {
-                          setState(() {
-                            user.mobile = value;
-                          });
+                          user.mobile = value;
                         },
-                        validator: MinLengthValidator(10, errorText: "Minimum 10 number"),
-                      ),
+                      ), //mobile number field
                       SizedBox(height: 10),
-                      TextFormField(
-                        decoration: InputDecoration(
-                          labelText: "Full Name",
-                        ),
+                      InputField(
+                        labelText: "Full Name",
                         onChanged: (value) {
-                          setState(() {
-                            user.fullName = value;
-                          });
+                          user.fullName = value;
                         },
-                        validator: RequiredValidator(errorText: "Name cannot be empty"),
-                      ),
+                      ), // full name field
                       SizedBox(height: 10),
                       Row(
                         children: [
@@ -170,55 +150,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               //launch camera
                               openCamera();
                             },
-                          ),
+                          ), //camera button
                           SizedBox(width: 10),
                           Text("Or"),
                           SizedBox(width: 10),
                           Expanded(
-                            child: TextButton(
-                              style: TextButton.styleFrom(side: BorderSide(color: Colors.blue)),
+                            child: SecondaryButton(
+                              text: user.imageName ?? "Profile Picture",
                               onPressed: () {
-                                //select image
+                                //get the image
                                 getImage();
                               },
-                              child: Text(user.imageName == null ? "Profile Picture" : user.imageName),
                             ),
-                          ),
+                          ), //profile picture button
                         ],
                       ),
                       SizedBox(height: 60),
-                      Hero(
-                        tag: 'button',
-                        child: FilledButton(
-                          text: "Sign up",
-                          onPressed: () async {
-                            //sign up
-                            if (formKey.currentState.validate()) {
-                              print("validated");
-                              setState(() {
-                                _isSaving = true;
-                              });
-                              var res = await user.registerUser(user);
-                              setState(() {
-                                _isSaving = false;
-                              });
-                              if (res == null) {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                      builder: (context) => HomeScreen(),
-                                    ),
-                                    (Route<dynamic> route) => false);
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(res),
+                      PrimaryButton(
+                        text: "Sign up",
+                        onPressed: () async {
+                          //sign up
+                          if (formKey.currentState.validate()) {
+                            print("validated");
+                            setState(() {
+                              _isSaving = true;
+                            });
+                            var res = await user.registerUser(user); // try to register the user
+                            setState(() {
+                              _isSaving = false;
+                            });
+                            if (res == null) {
+                              //user registration successful
+                              Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                    builder: (context) => HomeScreen(),
                                   ),
-                                );
-                              }
+                                  (Route<dynamic> route) => false);
+                            } else {
+                              //user registration failed
+                              showSnackBar(context: context, message: res);
                             }
-                          },
-                        ),
-                      ),
+                          }
+                        },
+                      ), //submit button
                       SizedBox(height: 10),
                       TextButton(
                         onPressed: () {
@@ -231,36 +205,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           );
                         },
                         child: Text('Already have an account? Log in'),
-                      ),
+                      ), //login button
                       SizedBox(height: 20),
-                      OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          padding: EdgeInsets.symmetric(vertical: 10),
-                        ),
-                        onPressed: () async {
-                          //login with Google
-                          var res = await user.loginWithGoogle();
-                          if (res == null) {
-                            Navigator.of(context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (context) => HomeScreen(),
-                                ),
-                                (Route<dynamic> route) => false);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Error occurred. Try email or try again later")),
-                            );
-                          }
-                        },
-                        icon: Icon(
-                          FontAwesomeIcons.google,
-                          color: Colors.blue,
-                        ),
-                        label: Text(
-                          "Sign up with Google",
-                          style: TextStyle(color: Colors.black54),
-                        ),
-                      ),
+                      GoogleButton(),
                     ],
                   ),
                 ),

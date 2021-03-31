@@ -1,8 +1,9 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:machtrac/UI/screens/login_screen.dart';
-import 'package:machtrac/UI/widgets/filled_button.dart';
+import 'package:machtrac/screens/login_screen.dart';
+
+import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/primary_button.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   @override
@@ -41,7 +42,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 SizedBox(height: 40),
                 Hero(
                   tag: 'button',
-                  child: FilledButton(
+                  child: PrimaryButton(
                     text: "Submit",
                     onPressed: () async {
                       if (formKey.currentState.validate()) {
