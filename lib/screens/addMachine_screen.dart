@@ -17,6 +17,40 @@ class AddMachineScreen extends StatelessWidget {
   final linkController = TextEditingController();
   final Machine machine = Machine();
   final formKey = GlobalKey<FormState>();
+
+  //validate details to submit
+  void validateDetails(BuildContext context) async {
+    if (formKey.currentState.validate()) {
+      //fields validated successfully
+      machine.imageName = Provider.of<MachineData>(context, listen: false).imageName;
+      machine.image = Provider.of<MachineData>(context, listen: false).image;
+      //check if image is selected
+      if (machine.imageName != null) {
+        //add machine
+        //check if fetch link is validated
+        if (Provider.of<MachineData>(context, listen: false).isFetchLinkCorrect) {
+          Provider.of<MachineData>(context, listen: false).toggleSaving();
+          var res = await machine.uploadMachineData(machine); //upload machine data to db
+          Provider.of<MachineData>(context, listen: false).toggleSaving();
+          if (res != null) {
+            showSnackBar(context: context, message: "Error uploading data. Try again later");
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(
+                builder: (context) => HomeScreen(),
+              ),
+            );
+          }
+        } else {
+          showSnackBar(context: context, message: "Please check the fetch link and try again");
+        }
+      } else {
+        showSnackBar(context: context, message: "Please select an image");
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,7 +126,7 @@ class AddMachineScreen extends StatelessWidget {
                               ),
                             ),
                           ],
-                        ),
+                        ), //fetch link
                         SizedBox(height: 10),
                         Text("Or"),
                         SizedBox(height: 10),
@@ -112,14 +146,14 @@ class AddMachineScreen extends StatelessWidget {
                             machine.fetchLink = linkController.text;
                           },
                           child: Text("Scan QR"),
-                        ),
+                        ), //QR Scan button
                         InputField(
                           labelText: "Capacity",
                           onChanged: (value) {
                             machine.capacity = value;
                           },
                           validator: MultiValidator([RequiredValidator(errorText: "Cannot be empty")]),
-                        ),
+                        ), //capacity
                         SizedBox(height: 20),
                         Row(
                           children: [
@@ -131,8 +165,6 @@ class AddMachineScreen extends StatelessWidget {
                               onPressed: () {
                                 //launch camera
                                 Provider.of<MachineData>(context, listen: false).getImageFromCamera();
-                                machine.image = Provider.of<MachineData>(context).image;
-                                machine.imageName = Provider.of<MachineData>(context).imageName;
                               },
                             ), //image select from camera
                             SizedBox(width: 10),
@@ -143,10 +175,7 @@ class AddMachineScreen extends StatelessWidget {
                                 style: TextButton.styleFrom(side: BorderSide(color: Colors.blue)),
                                 onPressed: () async {
                                   //select image
-                                  machine.image = Provider.of<MachineData>(context, listen: false).image;
-                                  machine.imageName = Provider.of<MachineData>(context, listen: false).imageName;
                                   Provider.of<MachineData>(context, listen: false).getImageFromStorage();
-                                  print(machine.imageName);
                                 },
                                 child: Text(Provider.of<MachineData>(context).imageName ?? "Select image"),
                               ),
@@ -174,40 +203,16 @@ class AddMachineScreen extends StatelessWidget {
                               },
                             ), //get location button
                           ],
-                        ),
+                        ), //location
                       ],
                     ),
                     SizedBox(height: 40),
                     PrimaryButton(
-                        text: "Add Machine",
-                        onPressed: () async {
-                          if (formKey.currentState.validate()) {
-                            machine.imageName = Provider.of<MachineData>(context, listen: false).imageName;
-                            machine.image = Provider.of<MachineData>(context, listen: false).image;
-                            if (machine.imageName != null) {
-                              //add machine
-                              if (Provider.of<MachineData>(context, listen: false).isFetchLinkCorrect) {
-                                Provider.of<MachineData>(context, listen: false).toggleSaving();
-                                var res = await machine.uploadMachineData(machine);
-                                Provider.of<MachineData>(context, listen: false).toggleSaving();
-                                if (res != null) {
-                                  showSnackBar(context: context, message: "Error uploading data. Try again later");
-                                } else {
-                                  Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => HomeScreen(),
-                                    ),
-                                  );
-                                }
-                              } else {
-                                showSnackBar(context: context, message: "Please check the fetch link and try again");
-                              }
-                            } else {
-                              showSnackBar(context: context, message: "Please select an image");
-                            }
-                          }
-                        }),
+                      text: "Add Machine",
+                      onPressed: () {
+                        validateDetails(context);
+                      },
+                    ),
                   ],
                 ),
               ),

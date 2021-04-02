@@ -4,7 +4,6 @@ import 'package:machtrac/models/user.dart';
 import 'package:machtrac/screens/home_screen.dart';
 import 'package:machtrac/widgets/components/snackbar.dart';
 
-
 class GoogleButton extends StatelessWidget {
   final User user = User();
   @override

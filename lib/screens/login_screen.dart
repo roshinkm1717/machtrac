@@ -2,14 +2,15 @@ import 'package:double_back_to_close/double_back_to_close.dart';
 import 'package:flutter/material.dart';
 import 'package:machtrac/constants.dart';
 import 'package:machtrac/models/user.dart';
+import 'package:machtrac/provider/machine_data.dart';
 import 'package:machtrac/screens/forgotPassword_screen.dart';
 import 'package:machtrac/screens/signup_screen.dart';
+import 'package:machtrac/widgets/buttons/google_button.dart';
+import 'package:machtrac/widgets/buttons/primary_button.dart';
 import 'package:machtrac/widgets/components/inputField.dart';
 import 'package:machtrac/widgets/components/snackbar.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/google_button.dart';
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/primary_button.dart';
+import 'package:provider/provider.dart';
 
 import 'home_screen.dart';
 
@@ -29,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
       message: "Tap again to close app",
       child: Scaffold(
         body: ModalProgressHUD(
-          inAsyncCall: _isSaving,
+          inAsyncCall: Provider.of<MachineData>(context).isSaving,
           progressIndicator: CircularProgressIndicator(),
           child: SafeArea(
             child: Padding(
@@ -91,13 +92,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             //login
                             if (formKey.currentState.validate()) {
                               print("Validated!");
-                              setState(() {
-                                _isSaving = true;
-                              });
                               var res = await user.userLogin(user);
-                              setState(() {
-                                _isSaving = false;
-                              });
                               if (res == null) {
                                 Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(

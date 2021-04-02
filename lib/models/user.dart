@@ -45,6 +45,7 @@ class User {
       }
       return null;
     } on PlatformException catch (e) {
+      print(e.message);
       return e.message;
     }
   }

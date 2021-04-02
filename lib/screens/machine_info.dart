@@ -38,12 +38,12 @@ class _MachineInfoState extends State<MachineInfo> {
       weeklyReport.lastRequestedTime = resWeekly[1];
     });
     if (dailyReport.reportsRemaining == 0 || weeklyReport.reportsRemaining == 0) {
-      List topUpData = await topUp.getTopUpData();
-      setState(() {
-        topUp.lastRequestedDailyTime = topUpData[0];
-        topUp.lastRequestedWeeklyTime = topUpData[1];
-      });
-      print("getting data regarding reports from db...");
+    List topUpData = await topUp.getTopUpData();
+    setState(() {
+      topUp.lastRequestedDailyTime = topUpData[0];
+      topUp.lastRequestedWeeklyTime = topUpData[1];
+    });
+    print("getting data regarding reports from db...");
     }
   }
 
@@ -101,7 +101,8 @@ class _MachineInfoState extends State<MachineInfo> {
                 SizedBox(height: 10),
                 Text("Reports Remaining"),
                 SizedBox(height: 5),
-                Text("Daily: ${dailyReport.reportsRemaining}\n7 Day Reports: ${weeklyReport.reportsRemaining}"), //reports remaining
+                Text(
+                    "Daily: ${dailyReport.reportsRemaining}\n7 Day Reports: ${weeklyReport.reportsRemaining}"), //reports remaining
                 SizedBox(height: 40),
                 PrimaryButton(
                   text: "Generate Report",
@@ -109,7 +110,8 @@ class _MachineInfoState extends State<MachineInfo> {
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
-                        return buildGenerateReportDialog(context, dailyReport, weeklyReport, widget.doc, getDataFromDatabase);
+                        return buildGenerateReportDialog(
+                            context, dailyReport, weeklyReport, widget.doc, getDataFromDatabase);
                       },
                     );
                   },

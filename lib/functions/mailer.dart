@@ -1,7 +1,8 @@
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
 
-sendReportRequestToMachtrac({String machineName, String machineMake, String fetchLink, String currentUser, bool isDaily}) async {
+sendReportRequestToMachtrac(
+    {String machineName, String machineMake, String fetchLink, String currentUser, bool isDaily}) async {
   var currentTime = DateTime.now();
   String username = 'machtracorg@gmail.com';
   String password = 'machtrac@google';
@@ -9,9 +10,10 @@ sendReportRequestToMachtrac({String machineName, String machineMake, String fetc
   final smtpServer = gmail(username, password);
   final message = Message()
     ..from = Address(username, 'Machtrac')
-    ..recipients.add('roshinkm17@gmail.com')
+    ..recipients.add('machtrac.kmt@outlook.com')
     ..subject = 'Request For' + (isDaily ? "Daily" : "7 Day") + "Report"
-    ..text = ' MailID : $currentUser \n Machine Name : $machineName \n Machine make : $machineMake \n Fetch link : $fetchLink \n $currentTime';
+    ..text =
+        ' MailID : $currentUser \n Machine Name : $machineName \n Machine make : $machineMake \n Fetch link : $fetchLink \n $currentTime';
   try {
     await send(message, smtpServer);
   } on MailerException catch (e) {
@@ -30,7 +32,7 @@ sendTopUpRequestToMachtrac({bool isDaily, String currentUser}) async {
   final smtpServer = gmail(username, password);
   final message = Message()
     ..from = Address(username, 'Machtrac')
-    ..recipients.add('roshinkm17@gmail.com')
+    ..recipients.add('machtrac.kmt@outlook.com')
     ..subject = 'Request For' + (isDaily ? "Daily" : "7 Day") + "Report Boost"
     ..text = ' MailID : $currentUser';
   try {
