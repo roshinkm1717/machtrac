@@ -12,12 +12,13 @@ class HomeScreenAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
+      automaticallyImplyLeading: false,
       title: Row(
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(100),
             child: CircleAvatar(
-              child: imageUrl != null ? Image.network(imageUrl) : Icon(FontAwesomeIcons.userAlt, size: 16),
+              child: imageUrl != null ? Image.network(imageUrl, fit: BoxFit.fill) : Icon(FontAwesomeIcons.userAlt, size: 16),
             ),
           ),
           SizedBox(width: 10),

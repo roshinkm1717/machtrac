@@ -1,98 +1,28 @@
-import 'dart:io';
-
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:form_field_validator/form_field_validator.dart';
-import 'package:geocoding/geocoding.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import 'package:machtrac/models/machine.dart';
+import 'package:machtrac/provider/machine_data.dart';
+import 'package:machtrac/widgets/buttons/primary_button.dart';
+import 'package:machtrac/widgets/components/inputField.dart';
+import 'package:machtrac/widgets/components/snackbar.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
-import 'package:path/path.dart';
-import 'package:qrscan/qrscan.dart' as scanner;
-
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/primary_button.dart';
+import 'package:provider/provider.dart';
 
 import 'home_screen.dart';
 
-Future<Position> _determinePosition() async {
-  bool serviceEnabled;
-  LocationPermission permission;
-  // Test if location services are enabled.
-  serviceEnabled = await Geolocator.isLocationServiceEnabled();
-  if (!serviceEnabled) {
-    // Location services are not enabled don't continue
-    // accessing the position and request users of the
-    // App to enable the location services.
-    return Future.error('Location services are disabled.');
-  }
-  permission = await Geolocator.checkPermission();
-  if (permission == LocationPermission.denied) {
-    permission = await Geolocator.requestPermission();
-    if (permission == LocationPermission.deniedForever) {
-      // Permissions are denied forever, handle appropriately.
-      return Future.error('Location permissions are permanently denied, we cannot request permissions.');
-    }
-    if (permission == LocationPermission.denied) {
-      // Permissions are denied, next time you could try
-      // requesting permissions again (this is also where
-      // Android's shouldShowRequestPermissionRationale
-      // returned true. According to Android guidelines
-      // your App should show an explanatory UI now.
-      return Future.error('Location permissions are denied');
-    }
-  }
-  // When we reach here, permissions are granted and we can
-  // continue accessing the position of the device.
-  return await Geolocator.getCurrentPosition();
-}
-
-class AddMachineScreen extends StatefulWidget {
-  @override
-  _AddMachineScreenState createState() => _AddMachineScreenState();
-}
-
-class _AddMachineScreenState extends State<AddMachineScreen> {
-  openCamera() async {
-    PickedFile pickedFile = await ImagePicker.platform.pickImage(source: ImageSource.camera, imageQuality: 50);
-    if (pickedFile != null) {
-      setState(() {
-        machine.image = File(pickedFile.path);
-        machine.imageName = basename(pickedFile.path);
-      });
-    }
-  }
-
-  getImage() async {
-    FilePickerResult result = await FilePicker.platform.pickFiles(
-      type: FileType.image,
-      allowMultiple: false,
-    );
-    if (result != null) {
-      setState(() {
-        machine.image = File(result.paths[0]);
-        print(machine.image);
-        machine.imageName = basename(result.paths[0]);
-      });
-    }
-  }
-
-  var controller = TextEditingController();
-  var linkController = TextEditingController();
-  bool _isSaving = false;
-  Machine machine = Machine();
+class AddMachineScreen extends StatelessWidget {
+  final controller = TextEditingController();
+  final linkController = TextEditingController();
+  final Machine machine = Machine();
   final formKey = GlobalKey<FormState>();
-  bool _link = false;
   @override
   Widget build(BuildContext context) {
-    bool loc = false;
     return Scaffold(
       appBar: AppBar(),
       body: ModalProgressHUD(
-        inAsyncCall: _isSaving,
+        inAsyncCall: Provider.of<MachineData>(context).isSaving,
         progressIndicator: CircularProgressIndicator(),
         child: SafeArea(
           child: SingleChildScrollView(
@@ -107,96 +37,59 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: "Machine name",
-                          ),
-                          keyboardType: TextInputType.emailAddress,
+                        InputField(
+                          labelText: "Machine name",
                           onChanged: (value) {
-                            setState(() {
-                              machine.name = value;
-                            });
+                            machine.name = value;
                           },
-                          validator: RequiredValidator(errorText: "Cannot be empty"),
-                        ),
+                          validator: MultiValidator([RequiredValidator(errorText: "Cannot be empty")]),
+                        ), //machine name
                         SizedBox(height: 10),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: "Machine make",
-                          ),
-                          keyboardType: TextInputType.emailAddress,
+                        InputField(
+                          labelText: "Machine make",
                           onChanged: (value) {
-                            setState(() {
-                              machine.make = value;
-                            });
+                            machine.make = value;
                           },
-                          validator: RequiredValidator(errorText: "Cannot be empty"),
-                        ),
+                          validator: MultiValidator([RequiredValidator(errorText: "Cannot be empty")]),
+                        ), //machine make
                         SizedBox(height: 10),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: "Year of Manufacturing",
-                          ),
+                        InputField(
+                          labelText: "Year of Manufacturing",
+                          onChanged: (value) {
+                            machine.manYear = int.parse(value);
+                          },
                           keyboardType: TextInputType.number,
-                          onChanged: (value) {
-                            setState(() {
-                              machine.manYear = int.parse(value);
-                            });
-                          },
-                          validator: RequiredValidator(errorText: "Cannot be empty"),
-                        ),
+                          validator: MultiValidator([RequiredValidator(errorText: "Cannot be empty")]),
+                        ), //year of manufacturing
                         SizedBox(height: 10),
                         Row(
                           children: [
                             Expanded(
-                              child: TextFormField(
+                              child: InputField(
                                 controller: linkController,
-                                decoration: InputDecoration(
-                                  labelText: "Fetch link",
-                                ),
+                                labelText: "Fetch link",
                                 onChanged: (value) {
-                                  setState(() {
-                                    machine.fetchLink = value;
-                                  });
+                                  machine.fetchLink = value;
                                 },
-                                validator: RequiredValidator(
-                                  errorText: "Cannot be empty",
-                                ),
+                                validator: MultiValidator([RequiredValidator(errorText: "Cannot be empty")]),
                               ),
-                            ),
+                            ), //fetch link
                             IconButton(
                               onPressed: () async {
                                 if (machine.fetchLink != null) {
-                                  try {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text("Checking link"),
-                                        duration: Duration(seconds: 1),
-                                      ),
-                                    );
-                                    var response = await http.get(Uri.parse(machine.fetchLink));
-                                    if (response.statusCode == 400 || response.statusCode == 401 || response.statusCode == 403) {
-                                      setState(() {
-                                        _link = false;
-                                      });
-                                    } else
-                                      setState(() {
-                                        _link = true;
-                                      });
-                                  } catch (e) {
-                                    setState(() {
-                                      _link = false;
-                                    });
-                                  }
+                                  showSnackBar(context: context, message: "Checking link...");
+                                  Provider.of<MachineData>(context, listen: false).checkFetchLink(machine.fetchLink);
                                 }
                               },
                               icon: Icon(
                                 Icons.check_circle_outline_rounded,
-                                color: (_link ?? false) ? Colors.green : Colors.red,
+                                color: (Provider.of<MachineData>(context).isFetchLinkCorrect == null)
+                                    ? Colors.grey
+                                    : (Provider.of<MachineData>(context).isFetchLinkCorrect
+                                        ? Colors.green
+                                        : Colors.red),
                                 size: 32,
                               ),
-                              focusColor: (_link ?? false) ? Colors.green : Colors.red,
-                              color: (_link ?? false) ? Colors.green : Colors.red,
                             ),
                           ],
                         ),
@@ -214,24 +107,18 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                           ),
                           onPressed: () async {
                             //scan QR
-                            String cameraScanResult = await scanner.scan();
-                            setState(() {
-                              machine.fetchLink = cameraScanResult;
-                              linkController.text = cameraScanResult;
-                            });
+                            linkController.text =
+                                await Provider.of<MachineData>(context, listen: false).getLinkFromQR();
+                            machine.fetchLink = linkController.text;
                           },
                           child: Text("Scan QR"),
                         ),
-                        TextFormField(
-                          decoration: InputDecoration(
-                            labelText: "Capacity",
-                          ),
+                        InputField(
+                          labelText: "Capacity",
                           onChanged: (value) {
-                            setState(() {
-                              machine.capacity = value;
-                            });
+                            machine.capacity = value;
                           },
-                          validator: RequiredValidator(errorText: "Cannot be empty"),
+                          validator: MultiValidator([RequiredValidator(errorText: "Cannot be empty")]),
                         ),
                         SizedBox(height: 20),
                         Row(
@@ -243,108 +130,84 @@ class _AddMachineScreenState extends State<AddMachineScreen> {
                               ),
                               onPressed: () {
                                 //launch camera
-                                openCamera();
+                                Provider.of<MachineData>(context, listen: false).getImageFromCamera();
+                                machine.image = Provider.of<MachineData>(context).image;
+                                machine.imageName = Provider.of<MachineData>(context).imageName;
                               },
-                            ),
+                            ), //image select from camera
                             SizedBox(width: 10),
                             Text("Or"),
                             SizedBox(width: 10),
                             Expanded(
                               child: TextButton(
                                 style: TextButton.styleFrom(side: BorderSide(color: Colors.blue)),
-                                onPressed: () {
+                                onPressed: () async {
                                   //select image
-                                  getImage();
+                                  machine.image = Provider.of<MachineData>(context, listen: false).image;
+                                  machine.imageName = Provider.of<MachineData>(context, listen: false).imageName;
+                                  Provider.of<MachineData>(context, listen: false).getImageFromStorage();
+                                  print(machine.imageName);
                                 },
-                                child: Text(machine.imageName == null ? "Select image" : machine.imageName),
+                                child: Text(Provider.of<MachineData>(context).imageName ?? "Select image"),
                               ),
-                            ),
+                            ), //image select from storage
                           ],
-                        ),
+                        ), //image selection
                         SizedBox(height: 10),
                         Row(
                           children: [
                             Expanded(
-                              child: TextFormField(
+                              child: InputField(
                                 controller: controller,
-                                decoration: InputDecoration(
-                                  labelText: "Location",
-                                ),
-                                keyboardType: TextInputType.streetAddress,
+                                labelText: "Location",
                                 onChanged: (value) {
-                                  setState(() {
-                                    machine.location = value;
-                                  });
+                                  machine.location = value;
                                 },
-                                validator: RequiredValidator(errorText: "Cannot be empty"),
+                                validator: MultiValidator([RequiredValidator(errorText: "Cannot be empty")]),
                               ),
-                            ),
+                            ), //location field
                             IconButton(
                               icon: Icon(Icons.location_searching),
                               onPressed: () async {
-                                Position location = await _determinePosition();
-                                List<Placemark> placeMarks = await placemarkFromCoordinates(location.latitude, location.longitude);
-                                print(placeMarks[0].locality);
-                                setState(() {
-                                  loc = true;
-                                  machine.location = placeMarks[0].locality + "," + placeMarks[0].administrativeArea + "," + placeMarks[0].country;
-                                  controller.text = machine.location;
-                                  print(machine.location);
-                                });
+                                String loc = await Provider.of<MachineData>(context, listen: false).getLocation();
+                                controller.text = loc;
                               },
-                            ),
+                            ), //get location button
                           ],
                         ),
                       ],
                     ),
                     SizedBox(height: 40),
-                    Hero(
-                      tag: 'button',
-                      child: PrimaryButton(
-                          text: "Add Machine",
-                          onPressed: () async {
-                            if (formKey.currentState.validate()) {
-                              if (machine.imageName != null) {
-                                //add machine
-                                if (_link) {
-                                  setState(() {
-                                    _isSaving = true;
-                                  });
-                                  var res = await machine.uploadMachineData(machine);
-                                  setState(() {
-                                    _isSaving = false;
-                                  });
-                                  if (res != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text("Error uploading data. Try again"),
-                                      ),
-                                    );
-                                  } else {
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => HomeScreen(),
-                                      ),
-                                    );
-                                  }
+                    PrimaryButton(
+                        text: "Add Machine",
+                        onPressed: () async {
+                          if (formKey.currentState.validate()) {
+                            machine.imageName = Provider.of<MachineData>(context, listen: false).imageName;
+                            machine.image = Provider.of<MachineData>(context, listen: false).image;
+                            if (machine.imageName != null) {
+                              //add machine
+                              if (Provider.of<MachineData>(context, listen: false).isFetchLinkCorrect) {
+                                Provider.of<MachineData>(context, listen: false).toggleSaving();
+                                var res = await machine.uploadMachineData(machine);
+                                Provider.of<MachineData>(context, listen: false).toggleSaving();
+                                if (res != null) {
+                                  showSnackBar(context: context, message: "Error uploading data. Try again later");
                                 } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text("Please check the fetch link and try again"),
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => HomeScreen(),
                                     ),
                                   );
                                 }
                               } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text("Please select an image"),
-                                  ),
-                                );
+                                showSnackBar(context: context, message: "Please check the fetch link and try again");
                               }
+                            } else {
+                              showSnackBar(context: context, message: "Please select an image");
                             }
-                          }),
-                    ),
+                          }
+                        }),
                   ],
                 ),
               ),

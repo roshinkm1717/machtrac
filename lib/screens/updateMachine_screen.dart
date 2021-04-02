@@ -355,12 +355,11 @@ class _UpdateMachineScreenState extends State<UpdateMachineScreen> {
                                               ),
                                             );
                                           } else {
-                                            Navigator.pushReplacement(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => HomeScreen(),
-                                              ),
-                                            );
+                                            Navigator.of(context).pushAndRemoveUntil(
+                                                MaterialPageRoute(
+                                                  builder: (context) => HomeScreen(),
+                                                ),
+                                                (Route<dynamic> route) => false);
                                           }
                                         }
                                       },
