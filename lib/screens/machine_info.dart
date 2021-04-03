@@ -15,7 +15,7 @@ class MachineInfo extends StatefulWidget {
   MachineInfo({this.doc, this.status});
 
   final QueryDocumentSnapshot doc;
-  final AsyncSnapshot<dynamic> status;
+  final bool status;
   @override
   _MachineInfoState createState() => _MachineInfoState();
 }
@@ -38,12 +38,12 @@ class _MachineInfoState extends State<MachineInfo> {
       weeklyReport.lastRequestedTime = resWeekly[1];
     });
     if (dailyReport.reportsRemaining == 0 || weeklyReport.reportsRemaining == 0) {
-    List topUpData = await topUp.getTopUpData();
-    setState(() {
-      topUp.lastRequestedDailyTime = topUpData[0];
-      topUp.lastRequestedWeeklyTime = topUpData[1];
-    });
-    print("getting data regarding reports from db...");
+      List topUpData = await topUp.getTopUpData();
+      setState(() {
+        topUp.lastRequestedDailyTime = topUpData[0];
+        topUp.lastRequestedWeeklyTime = topUpData[1];
+      });
+      print("getting data regarding reports from db...");
     }
   }
 

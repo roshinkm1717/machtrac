@@ -30,6 +30,7 @@ dependencies:
   qrscan:
   mailer:
   provider:
+  flare_splash_screen: ^3.0.2
 
 dev_dependencies:
   flutter_test:

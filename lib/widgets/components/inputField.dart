@@ -10,7 +10,9 @@ class InputField extends StatelessWidget {
       this.validator,
       this.obscureText,
       this.onIconTap,
+      this.initialValue,
       this.passwordCheckValidator});
+
   final String labelText;
   final TextInputType keyboardType;
   final Function onChanged;
@@ -18,10 +20,12 @@ class InputField extends StatelessWidget {
   final Function passwordCheckValidator;
   final bool obscureText;
   final Function onIconTap;
+  final String initialValue;
   final TextEditingController controller;
   @override
   Widget build(BuildContext context) {
     return TextFormField(
+      initialValue: initialValue ?? "",
       controller: controller,
       decoration: InputDecoration(
         labelText: labelText,

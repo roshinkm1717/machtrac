@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
@@ -6,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:machtrac/functions/http.dart' as http_fn;
 import 'package:machtrac/functions/location.dart';
 import 'package:machtrac/functions/storage.dart' as storage;
+import 'package:machtrac/models/machine.dart';
 import 'package:path/path.dart';
 
 class MachineData extends ChangeNotifier {
@@ -14,7 +16,8 @@ class MachineData extends ChangeNotifier {
   String location, fetchLink;
   bool isFetchLinkCorrect;
   bool isSaving;
-  MachineData({this.isSaving = false, this.location, this.isFetchLinkCorrect, this.fetchLink});
+  bool machineStatus;
+  MachineData({this.isSaving = false, this.location, this.isFetchLinkCorrect, this.fetchLink, this.machineStatus});
 
   get image => _image;
   get imageName => _imageName;
@@ -60,5 +63,13 @@ class MachineData extends ChangeNotifier {
   void toggleSaving() {
     isSaving = !isSaving;
     notifyListeners();
+  }
+
+  Future<bool> keepGettingMachineStatus(Machine machine) async {
+    Timer.periodic(Duration(seconds: 3), (Timer timer) async {
+      machineStatus = await machine.getMachineStatus(machine.fetchLink);
+    });
+    notifyListeners();
+    return machineStatus;
   }
 }

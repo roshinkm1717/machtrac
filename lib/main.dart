@@ -13,7 +13,7 @@ void main() async {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider<MachineData>(
+    return ChangeNotifierProvider(
       create: (context) => MachineData(),
       child: MaterialApp(
         title: 'Machtrac',

@@ -84,4 +84,18 @@ class User {
       print(e);
     }
   }
+
+  Future<List> getUserDetails() async {
+    String email = FirebaseAuth.instance.currentUser.email;
+    DocumentSnapshot snapshot = await FirebaseFirestore.instance.collection('users').doc(email).get();
+    return [snapshot.data()['fullName'], snapshot.data()['mobile']];
+  }
+
+  updateUserDetails(String fullName, String mobile) async {
+    String email = FirebaseAuth.instance.currentUser.email;
+    await FirebaseFirestore.instance.collection('users').doc(email).update({
+      'fullName': fullName,
+      'mobile': mobile,
+    });
+  }
 }

@@ -92,7 +92,9 @@ class _LoginScreenState extends State<LoginScreen> {
                             //login
                             if (formKey.currentState.validate()) {
                               print("Validated!");
+                              Provider.of<MachineData>(context, listen: false).toggleSaving();
                               var res = await user.userLogin(user);
+                              Provider.of<MachineData>(context, listen: false).toggleSaving();
                               if (res == null) {
                                 Navigator.of(context).pushAndRemoveUntil(
                                     MaterialPageRoute(

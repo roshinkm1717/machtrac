@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:machtrac/screens/machine_info.dart';
 
 class MachineCard extends StatelessWidget {
   MachineCard({this.doc, this.status});
   final DocumentSnapshot doc;
-  final AsyncSnapshot<dynamic> status;
+  final bool status;
   @override
   Widget build(BuildContext context) {
     return Hero(
@@ -14,7 +15,18 @@ class MachineCard extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(5),
           child: ListTile(
-            tileColor: status.data == null ? Colors.red.shade800 : (status.data ? Colors.green.shade800 : Colors.yellow.shade900),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => MachineInfo(
+                    doc: doc,
+                    status: status,
+                  ),
+                ),
+              );
+            },
+            tileColor: status == null ? Colors.red.shade800 : (status ? Colors.green.shade800 : Colors.yellow.shade900),
             contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
             leading: Container(
               height: 100,
@@ -33,7 +45,7 @@ class MachineCard extends StatelessWidget {
               ),
             ),
             subtitle: Text(
-              "${status.data == null ? 'No Signal' : (status.data == false ? 'Idle' : 'Running')}",
+              "${status == null ? 'No Signal' : (status == false ? 'Idle' : 'Running')}",
               style: TextStyle(color: Colors.white),
             ),
           ),

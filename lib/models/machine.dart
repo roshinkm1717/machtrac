@@ -20,7 +20,8 @@ class Machine {
     String downloadUrl;
     try {
       print("trying to upload machine data!");
-      DocumentReference documentReference = FirebaseFirestore.instance.collection('users').doc(email).collection('machines').doc();
+      DocumentReference documentReference =
+          FirebaseFirestore.instance.collection('users').doc(email).collection('machines').doc();
       await documentReference.set({
         'name': machine.name,
         'fetchLink': machine.fetchLink,
@@ -34,7 +35,12 @@ class Machine {
       Reference ref = FirebaseStorage.instance.ref("$email/${documentReference.id}/${machine.imageName}");
       await ref.putFile(machine.image);
       downloadUrl = await ref.getDownloadURL();
-      await FirebaseFirestore.instance.collection('users').doc(email).collection('machines').doc(documentReference.id).update(
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(email)
+          .collection('machines')
+          .doc(documentReference.id)
+          .update(
         {'imageUrl': downloadUrl},
       );
       print("uploaded!");
@@ -58,16 +64,19 @@ class Machine {
         return Future.value(null);
       }
     } else {
-      print('Request failed with status: ${response.statusCode}.');
       return Future.value(false);
     }
   }
 
   Future updateMachine(Machine machine, String oldName, String oldImageName) async {
-    print("updating...");
     String email = FirebaseAuth.instance.currentUser.email;
     String downloadUrl;
-    var snapshots = await FirebaseFirestore.instance.collection('users').doc(email).collection('machines').where('name', isEqualTo: oldName).get();
+    var snapshots = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(email)
+        .collection('machines')
+        .where('name', isEqualTo: oldName)
+        .get();
     try {
       DocumentSnapshot doc = snapshots.docs.first;
       print(doc.id);
