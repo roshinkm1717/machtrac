@@ -6,7 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:machtrac/screens/login_screen.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/primary_button.dart';
+import 'package:machtrac/widgets/buttons/primary_button.dart';
 
 import 'home_screen.dart';
 
@@ -91,7 +91,8 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                       children: [
                         Text(
                           'Machtrac',
-                          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 30),
                         ),
                         SizedBox(height: 0),
                         Text(

@@ -13,7 +13,7 @@ import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path/path.dart';
 import 'package:qrscan/qrscan.dart' as scanner;
 
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/primary_button.dart';
+import 'package:machtrac/widgets/buttons/primary_button.dart';
 
 import 'home_screen.dart';
 

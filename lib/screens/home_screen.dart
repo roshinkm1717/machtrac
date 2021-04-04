@@ -8,7 +8,7 @@ import 'package:machtrac/widgets/buttons/floating_button.dart';
 import 'package:machtrac/widgets/components/machine_card.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/components/homescreen_appbar.dart';
+import 'package:machtrac/widgets/components/homescreen_appbar.dart';
 
 import '../models/machine.dart';
 

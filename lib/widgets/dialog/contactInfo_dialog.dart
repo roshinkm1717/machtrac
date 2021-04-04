@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:machtrac/functions/url_launcher.dart';
 
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/primary_button.dart';
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/secondary_button.dart';
+import 'package:machtrac/widgets/buttons/primary_button.dart';
+import 'package:machtrac/widgets/buttons/secondary_button.dart';
 
 class ContactInfoDialog extends StatelessWidget {
   @override

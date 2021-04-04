@@ -12,10 +12,10 @@ import 'package:machtrac/widgets/components/snackbar.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:path/path.dart';
 
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/google_button.dart';
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/primary_button.dart';
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/secondary_button.dart';
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/components/inputField.dart';
+import 'package:machtrac/widgets/buttons/google_button.dart';
+import 'package:machtrac/widgets/buttons/primary_button.dart';
+import 'package:machtrac/widgets/buttons/secondary_button.dart';
+import 'package:machtrac/widgets/components/inputField.dart';
 
 import '../constants.dart';
 
@@ -26,7 +26,8 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   openCamera() async {
-    PickedFile pickedFile = await ImagePicker.platform.pickImage(source: ImageSource.camera, imageQuality: 50);
+    PickedFile pickedFile = await ImagePicker.platform
+        .pickImage(source: ImageSource.camera, imageQuality: 50);
     if (pickedFile != null) {
       setState(() {
         user.image = File(pickedFile.path);
@@ -72,7 +73,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     children: [
                       Text(
                         "Let's Get Started",
-                        style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 26, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 5),
                       Text(
@@ -121,7 +123,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           ),
                         ),
                         onChanged: (value) {},
-                        validator: (val) => MatchValidator(errorText: 'Passwords do not match').validateMatch(val, user.password),
+                        validator: (val) =>
+                            MatchValidator(errorText: 'Passwords do not match')
+                                .validateMatch(val, user.password),
                       ), //confirm password field
                       SizedBox(height: 10),
                       InputField(
@@ -175,7 +179,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             setState(() {
                               _isSaving = true;
                             });
-                            var res = await user.registerUser(user); // try to register the user
+                            var res = await user
+                                .registerUser(user); // try to register the user
                             setState(() {
                               _isSaving = false;
                             });

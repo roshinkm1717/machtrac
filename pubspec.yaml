@@ -11,18 +11,18 @@ dependencies:
     sdk: flutter
 
   cupertino_icons: ^1.0.0
-  firebase_core:
-  firebase_auth:
+  firebase_core: any
+  firebase_auth: any
   cloud_firestore:
   modal_progress_hud:
   double_back_to_close:
   file_picker:
-  firebase_storage:
+  firebase_storage: any
   form_field_validator:
   http:
   geocoding:
   geolocator:
-  url_launcher:
+  url_launcher: ^6.0.3
   shared_preferences:
   image_picker: any
   google_sign_in: any

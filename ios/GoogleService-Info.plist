@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CLIENT_ID</key>
+	<string>882486296953-kg8ea6slcq86hansa70scooapkn25jvp.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.882486296953-kg8ea6slcq86hansa70scooapkn25jvp</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>882486296953-noplu7nn8pglrv5d4h1kojboo5df8tai.apps.googleusercontent.com</string>
+	<key>API_KEY</key>
+	<string>AIzaSyBwfhfztZzaHADEcsDRWfYWGNCYlCA5MuE</string>
+	<key>GCM_SENDER_ID</key>
+	<string>882486296953</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.example.machtrac</string>
+	<key>PROJECT_ID</key>
+	<string>machtrac-bec53</string>
+	<key>STORAGE_BUCKET</key>
+	<string>machtrac-bec53.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:882486296953:ios:f60d9a6e6f60f5ff742fa8</string>
+</dict>
+</plist>

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:form_field_validator/form_field_validator.dart';
 import 'package:machtrac/screens/login_screen.dart';
 
-import 'file:///E:/Flutter%20Projects/Machtrac/Mobile/lib/widgets/buttons/primary_button.dart';
+import 'package:machtrac/widgets/buttons/primary_button.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   @override
@@ -47,7 +47,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     onPressed: () async {
                       if (formKey.currentState.validate()) {
                         try {
-                          await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+                          await FirebaseAuth.instance
+                              .sendPasswordResetEmail(email: email);
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text("Email has been sent. Check Inbox"),
